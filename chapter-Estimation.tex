@@ -1,0 +1,997 @@
+% $Id: chapter-Estimation.tex,v 1.4 2007/07/12 19:42:46 jdsahr Exp $
+
+\chapter{Estimation and Detection}
+
+{\Huge W}e constantly find that the radar systems are impacted by
+signals which behave in a manner that we think of as random.  There
+are several origins of ``randomness'' which are important to be aware
+of.  The scatter of radio waves from macroscopic objects
+(e.g. aircraft) is a completely deterministic process; however our
+state of knowledge about the location and pose of the aircraft is
+limited.  The problem of radars, after all, is not to know where a 
+target is, and to predict the electromagnetic energy which will be
+detected.  Instead, the problem of radars is to observe that some
+radiation has been detected, and to make inference about the cause of
+the detection.
+
+In some cases the scattering process itself has a stochastic nature.
+For example, ion sound wave turbulence in the E region is
+deterministic in the sense that it obeys the Navier-Stokes equations
+augmented by Maxwell's Equations.  However, as a strongly turbulent
+process, it is often conveniently described by statistical language
+and measures.
+
+Finally, at the statistical mechanics level, various sources of noise
+compete with the signals that we wish to intercept, ultimately
+providing implacable limits on detection and accuracy.
+
+To that end, we will introduce some basic ideas about statistics and
+estimation associated with random processes.
+
+
+\section{Random Processes}
+
+A random process is one whose behavior is random as opposed to
+deterministic.  By ``process'' we frequently mean the electromagnetic
+field intercepted by an antenna, or the voltage present at the
+terminal of the antenna, or the modified voltage-like signals that
+appear as the signal makes its way from the antenna through the digestive system
+of the radar.  Eventually the continuous time voltage will be
+converted to discrete time, sampled versions.  Those samples will be 
+subject to various linear and nonlinear transformations, all of which,
+as functions of random data, are themselves random.
+
+However, the randomness of the signal is not without limit; signals may be correlated 
+in time, significantly reducing the amount of randomness (in a way that can be
+made precise) a central
+goal of operation of radars is to constrain the randomness, and to
+assign meaning and likelihood to the results.
+
+We describe random processes somewhat differently than we describe
+other signals; although we use some of the same words, the meaning may
+have some subtle technical differences.  It is important to realize
+that all of our work is motivated by a desire to sensibly observe the
+environment, which obeys sensible laws of physics, and is, therefore,
+not ``random'' in any strict sense.  However, the ensemble of atoms
+and molecules is so large that statistical arguments are very
+appealing, and frequently accurate.  
+
+Let's begin with a single continuous time random process $x(t)$.
+Unless otherwise stated explicitly, such random processes will be
+presumed to have field units (volts) as opposed to power or energy
+units.  Also, these random processes will be presumed to be zero mean,
+unless otherwise stated explicitly.  This is not a large limitation
+for the case of radar, for which the received signal voltages are
+inevitably zero mean.  Instrumentation may introduce DC offsets but
+the scattered signals are inevitably zero mean.
+
+We will frequently need to compute functions of data when handling
+data drawn from random processes.  Often the function of the data will
+be some form of average.  We define the average value of the random
+process in two different ways with a subtle but extremely important
+technical distinction.
+
+\deff{Time Average}{
+An average may be formed from actual data, in either a continuous or
+discrete sense; as in
+\begin{equation}
+\bar{x} = \frac{1}{T}\int_T x(t) \; dt \equiv \frac{1}{N} \sum_N x[n]
+\end{equation}}
+
+\deff{Ensemble Average}{
+An idealized or theoretical average, formed by making a single
+independent measurement an infinite number of times; such averages may
+be computed by taking an appropriate moment of the probability density
+function of the random variable. }
+
+For example, the mean $\bar{x}$, or expected value of a random
+variable $x$ can be computed from the probability density function
+$f(x)$ as follows:
+\begin{equation}
+\bar{x} = \int x f_x(x) \; dx
+\end{equation}
+
+As a practical matter, all parameter estimation proceeds through time
+averages, because the ensemble average is never available.  It happens 
+that statistical theorems are frequently more easily proven in terms
+of ensemble average, however.  Thus it would be extremely convenient if
+the ensemble average and the time average were numerically equivalent.
+This turns out to be the usual case, although the issue is subtle.
+
+\deff{Ergodicity}{
+A random process is said to be ergodic if its time
+  averages are equivalent to its ensemble averages.}
+
+It is possible to imagine stochastic processes whose properties change
+as a function of time --- getting more powerful, changing their spectral
+shape, etc. --- such variation is straightforward to handle with
+ensemble averages.  However, in the real world we have to work with
+time averages, so if a process is changing its power during the time
+we are collecting measurements, ... well, it's a problem.  Thus we
+have the notion of \textit{stationarity}:
+
+\deff{Stationarity}{
+A stochastic process is said to be stationary if all of its moments
+are constant in time.}
+
+\deff{Mutual, or Joint Stationarity}{Several stochastic processes are
+  said to be jointly stationary if their joint moments are constant in
+  time.}
+
+It is very important to distinguish the concept of ``stationarity''
+from ``constancy.''  A coin toss is a non constant process yielding
+heads or tails; it is completely unpredictable.  On the other hand, a
+coin toss is ``stationary'' since the odds of head or tail does not
+change with time ... unless someone does something drastic to the coin 
+(such as bending it).
+
+The property of stationarity is very powerful; in radar we frequently
+need only a relaxed version of stationarity, namely ``wide sense
+stationary''
+
+\deff{Wide Sense Stationarity}{A process is said to be
+wide sense stationary if its second order moments are constant in
+time.}
+
+
+
+\subsection{Expected Value, or Expectation} 
+
+\label{s:expectedvalue}
+Very closely related to the notion of Ensemble Average is the Expected
+Value. 
+
+\deff{Expected Value}{The expected value of a random process is
+  its ensemble average.  We usually speak of the expected value
+  of a function of one or more random variables, which may or may not
+  be identically distributed.  The expected value is indicated by
+  angle brackets, e.g.
+\begin{displaymath}
+\langle g(x_1, x_2, \ldots x_N) \rangle = \int \!\!\int \!\! \ldots \int g(x_1,
+x_2, \ldots x_N) \; f_{x_1} f_{x_2} \cdots f_{x_N} dx_1 dx_2 \cdots dx_N
+\end{displaymath}
+}
+
+There are some simple calculus rules that one may apply to expressions
+with the expected value operator.  In the following rules $x, y$ are
+random variables, and $a, b$ are scalar contants:
+\begin{enumerate}
+\item Constants may be pulled out of expectations:
+  \begin{displaymath}
+  \langle a x \rangle = a \langle x \rangle
+  \end{displaymath}
+\item The expectation is linear: 
+  \begin{displaymath}
+  \langle ax + by \rangle = a \langle x \rangle + b \langle y \rangle
+  \end{displaymath}
+\item The expectation distributes across products of independent
+  random processes,
+  \begin{displaymath}
+  \langle x y \rangle = \langle x \rangle \langle y \rangle \;\;\;
+  \iff f_{xy}(x, y) = f_x(x) f_y(y)
+  \end{displaymath}
+\item The expectation does not commute with most operators, e.g.
+  \begin{eqnarray*}
+  \left\langle \frac{1}{x} \right\rangle &\ne & \frac{1}{\langle x \rangle} \\
+  \langle \sin(x) \rangle &\ne & \sin(\langle x \rangle)
+  \end{eqnarray*}
+\end{enumerate}
+
+\subsubsection{Isserlis Theorems for zero mean real gaussian random variables}
+
+Additional rules for manipulation of expectations are available when
+encountering products of gaussian random variables.  We will restrict
+our attention to zero mean gaussian random variables, which will
+suffice for our needs.  The extensions needed for non-zero mean
+gaussian processes are straightforward, but tedious.
+
+In the case of real valued, zero mean, gaussian random variables, we have
+\begin{equation}
+\langle xyzw \rangle = 
+  \langle xy \rangle \langle zw \rangle + 
+  \langle xz \rangle \langle yw \rangle + 
+  \langle xw \rangle \langle yz \rangle
+\end{equation}
+The rule generalizes to higher order products, ``The expected value of
+the product of an even number of gaussian random variables is equal to
+the sum over all permuations of the second order products.''  Thus for
+the fourth order case there are $3 = \left({}^4_2\right)$ terms, for
+the sixth order case there are $15 = \left({}^6_2\right)$ terms, etc.
+\begin{equation}
+\langle xyzwpq \rangle = \langle xy \rangle \langle zwpq \rangle +
+ \langle xz \rangle \langle ywpq \rangle +
+ \langle xw \rangle \langle yzpq \rangle +
+ \langle xp \rangle \langle yzwq \rangle +
+ \langle xq \rangle \langle yzwp \rangle
+\end{equation}
+Here each of the fourth order expectations can now be expanded using
+the earlier theorem.  It is usually quite tedious to work out
+statistics of order higher than 6.
+
+Note that the expected value of a product of an odd number of zero
+mean real gaussian random variables is necessarily zero.
+
+It is worth noting a useful special case:
+\begin{equation}
+\left\langle x^4 \right\rangle = 3 \left\langle x^2 \right\rangle^2 =
+3 \sigma^4
+\end{equation}
+$\sigma^2$ is the usual variance of the random variable $x$.
+
+\subsubsection{Isserlis Theorems for zero mean complex gaussian random variables}
+
+
+
+A similar set of theorems applies for complex valued, zero mean
+gaussian random variables of a kind which arise naturally in
+communications theory and radar remote sensing.  We will describe
+those signals elsewhere [[[ WHERE? ]]] for the present observe that
+the real and imaginary parts are independent and identically
+distributed zero man gaussian random variables.  Although the Isserlis
+Theorems are a bit more difficult to state, in practice they are
+easier to apply.
+
+
+\begin{equation}
+\left\langle \prod_{n=1}^N x_n \;\prod_{m=1}^M y_m^\ast \right\rangle
+= \left\{
+ \begin{array}{ll} 
+    0 & \textrm{if} \; N \ne M \\ 
+    \sum_P \prod_{n=1}^N \langle x_p y^\ast_{P(n)} \rangle &
+    \textrm{if} \; N = M
+ \end{array} \right.
+\end{equation}
+The latter sum is over all unique ways of picking pairs from $x$ and
+$y$; it's best to illustrate with an example.
+\begin{equation}
+\langle xy^\ast zw^\ast \rangle = 
+  \langle xy^\ast \rangle \langle zw^\ast \rangle + 
+  \langle xw^\ast \rangle \langle zy^\ast \rangle 
+\end{equation}
+Again, some special cases,
+\begin{eqnarray}
+\langle |x|^2 \rangle &=& \langle x\,x^\ast\rangle = \sigma^2 \\
+\langle |x|^4 \rangle &=& 2\langle x\,x^\ast \rangle^2 = 2 \sigma^4
+\\
+\langle |x|^6 \rangle &=& 6\sigma^6 \\
+\langle |x|^{2N} \rangle &=& N!\, \sigma^{2N}
+\end{eqnarray}
+
+An additional special case is worth mention for field quantities (i.e. voltage):
+\begin{equation}
+\left\langle xx \right\rangle = \left\langle x_r^2 - x_i^2 +j x_r x_i \right\rangle = 0 + j0
+\end{equation}
+In other words $\left\langle x_r^2\right\rangle = \left\langle x_i^2\right\rangle$ and $\left\langle x_r x_i\right\rangle = 0$.  This perhaps
+surprising result can be derived from the Kramers-Kronig [[ CITE ]] relations which result from the causality property that we expect 
+in the physics of this universe.
+
+
+\section{Estimation}
+
+Now we couple basic ideas from probability with the need to convert
+data into useful estimates.  Again, several definitions are coming.
+
+\deff{Estimator}{
+An estimator is a function of data which produces an
+estimate\footnote{a pure function of data is also known as a
+  \textit{statistic}} of a parameter (or perhaps several parameters).
+For example, the following is an example of an estimator for the
+arithmetic mean:
+\begin{displaymath}
+\frac{1}{N}\sum_{n=0}^N x_n
+\end{displaymath}}
+
+\deff{Estimate}{An estimate\footnote{\textit{ibid}} is the numerical
+  result of applying an estimator to data, thus $\hat{x}$ is an
+  estimate of the arithmetic mean: 
+\begin{displaymath}
+\hat{x} = \frac{1}{N}\sum_{n=0}^N x_n
+\end{displaymath}
+An estimate is a random variable, since it is a mathematical
+function of random variables.}
+
+Note that in summations we will use the convention that the lower
+limit is inclusive (typically starting at zero) and the upper limit is
+exclusive (last term is $N-1$, not $N$).
+
+\subsection{properties of estimators}
+
+Estimators may be good or bad, they may give answers which are always
+wrong, but for which the amount of wrongness improves (decreases) with
+more data.
+
+\deff{Unbiased Estimator}{
+An unbiased estimator has the important property that the expected
+value of its estimates is equal to the parameter being estimated; or
+mathematically, 
+\begin{displaymath}
+\langle \hat{x} \rangle = \langle x \rangle
+\end{displaymath}}
+
+\begin{example}{The usual estimator of the arithmetic mean is
+    unbiased.}  To show this, we use the properties in section
+  \ref{s:expectedvalue} on page \pageref{s:expectedvalue}:
+\begin{displaymath}
+\langle \hat{x} \rangle = 
+\left\langle\frac{1}{N}\sum_{n=0}^N x_n \right\rangle =
+\frac{1}{N}\sum_{n=0}^N \langle x_n \rangle =
+\frac{1}{N}\sum_{n=0}^N \langle x \rangle = 
+\frac{N}{N}\langle x \rangle = \langle x \rangle
+\end{displaymath}
+\end{example}
+
+A weaker but nevertheless useful property is ``consistency.''
+
+\deff{Consistent Estimator}{A biased estimater is said to be
+  consistent if the bias vanishes as the amount of data increases
+  without limit.}
+
+\begin{example}The ``obvious'' estimator of the standard deviation is
+biased but consistent:
+\begin{displaymath}
+\hat{SD}_0 = \left(1 - \frac{1}{N}\right) \sigma^2 
+\end{displaymath}
+The expected value differs from the ideal result by the
+factor $(1 - 1/N)$.  However, in the limit $N\rightarrow\infty$ the bias
+vanishes.
+\end{example}
+
+Additional properties of estimators are expressed in terms of the
+``goodness'' of estimators, which is typically expressed in terms of
+the variance of the estimate:
+
+\deff{Estimator Variance}{The variance of an estimator is defined as
+  the expected value of the square of the data less the true mean: 
+\begin{displaymath}
+\textrm{Var}\; \hat{p} = \left\langle \left|\hat{p} - \langle\hat{p} \rangle 
+\right|^2 \right\rangle
+\end{displaymath}
+When the estimator is real-valued, expanding the square and using the linearity of the
+$\langle\cdot\rangle$ operator we find equivalently that
+\begin{displaymath}
+\textrm{Var} \;\hat{p} = \langle\hat{p}^2\rangle - \langle \hat{p} \rangle^2
+\end{displaymath}
+This latter form is sometimes more convenient for calculations.
+When the estimator is complex-valued, the appropriate expressions is
+\begin{displaymath}
+\textrm{Var} \;\hat{p} = \langle\hat{p}\hat{p}^\ast \rangle - \langle \hat{p} \rangle \langle \hat{p}^\ast \rangle
+\end{displaymath}
+The latter expression works for both real and complex valued estimators.
+}
+
+
+By computing the estimator variance, we can compare the quality of two estimators, noting which
+produces the smaller variance, and leading to the following additional 
+definitions.
+
+\deff{sufficient estimator}{An estimator is said to be sufficient if
+  no other estimator produces a smaller variance.}
+
+\deff{efficient estimator}{An estimator is said to be efficient if it
+  produces the smallest possible variance for that parameter.  Every
+  efficient estimator is sufficient, but not all sufficient estimators
+  are efficient.}
+
+Sufficiency and Efficiency may appear to be the same thing, but they
+are different.  Efficiency is defined in terms of the ``theoretical
+limit'' defined by the Cramer-Rao Lower Bound (see Appendix
+\ref{s:cramer-rao}), which is a hard theoretic bound that no estimator
+can surpass.  However, efficient estimators may not exist, in which
+case there will still be many estimators that are ``pretty good'' in
+the sense of being better than most.
+
+It is important to note that estimator variance is neither the only, nor even necessarily the best
+measure of estimator quality.  For example, if the data are known to contain outliers, estimators
+using order statistics will generally have poorer (larger) variance, but will nevertheless 
+behave (significantlly) better.
+
+\subsection{Advice on manipulation of estimators}
+\label{s:estimator-advice}
+
+There is rarely any difficulty in evaluating first order estimators
+(the mean) for bias.  There is, however, ample opportunity for
+mischief.  In particular, consider the variance of an estimate of the
+sum of squares of data, that is, the power in a signal:
+\begin{eqnarray}
+\hat{P}_1 &=& \frac{1}{N} \sum_{n=0}^N |x_n|^2 \\
+\langle \hat{P}_1 \rangle &=& P \;\;\;\;\;\; \textrm{(unbiased)} \\
+\textrm{var} \hat{P}_1 &=& \langle \hat{P}^2 \rangle - \langle\hat{P}\rangle^2
+= \langle \hat{P}^2 \rangle - P^2 \\
+&=& \left\langle \left(\frac{1}{N} \sum_{n=0}^N |x_n|^2 \right)^2 \right\rangle
+- P^2 \\
+&=& \left\langle \left(\frac{1}{N} \sum_{n=0}^N |x_n|^2 \right)
+  \left(\frac{1}{N} \sum_{m=0}^N |x_m|^2 \right) \right\rangle - P^2 \\
+&=& \left\langle \frac{1}{N^2} \sum_{n=0}^N \sum_{m=0}^N |x_n|^2
+  |x_m|^2 \right\rangle - P^2 \\
+&=& \frac{1}{N^2} \sum_{n=0}^N \sum_{m=0}^N \left\langle |x_n|^2
+  |x_m|^2 \right\rangle - P^2 \label{e:varp}
+\end{eqnarray}
+The subtlety here is in the use of a second ``dummy'' index $m$ for
+the repeated power of the data $x$; it would be tempting, and wrong,
+to use the index $n$ twice.  A similar issue arises in the computation
+of powers of integrals.  It is reasonable to assert that the standard
+notation for sums and integrals contains the notational weakness of
+attaching an excess of meaning to the index of the sums, or the
+variable of integration, which is not truly warranted.
+
+We'll complete the evaluation of \eqref{varp} below.
+
+\section{Estimation of Signal Power}
+
+Let us consider the usual estimator of signal power,
+\begin{equation}
+\hat{P}_1 = \frac{1}{N}\sum_{n=0}^N |x_n|^2
+\end{equation}
+Having declared an estimator, one should then determine whether the
+estimator is biased:
+\begin{eqnarray}
+\langle\hat{P}_1\rangle &=& 
+\left\langle \frac{1}{N}\sum_{n=0}^N |x_n|^2 \right\rangle = \frac{1}{N}\sum_{n=0}^N \langle |x_n|^2
+  \rangle \\
+&=& \frac{1}{N}\sum_{n=0}^N P = P 
+\end{eqnarray}
+Thus the usual estimator of power is unbiased, since
+$\langle \hat{P}_1\rangle = P$.  
+
+Having established the (absence of) bias, we should then analyze the
+variance of the estimator,
+\begin{eqnarray}
+\textrm{var} \;\hat{P}_1 &=& \langle |\hat{P}_1|^2 \rangle - P^2
+\label{e:P1var-a} \\
+&=& \left\langle \left(\frac{1}{N}\sum_{n=0}^N |x_n|^2 \right) 
+  \left( \frac{1}{N}\sum_{m=0}^N |x_m|^2 \right) \right\rangle -
+P^2 \label{e:P1var-b} \\
+&=& \frac{1}{N^2}\sum_{n=0}^N \sum_{m=0}^N \langle|x_n|^2  |x_m|^2
+\rangle - P^2
+\end{eqnarray}
+In going from \eqref{P1var-a} to \eqref{P1var-b} we have used the
+``advice'' in section \ref{s:estimator-advice} about properly
+manipulating powers of sums.
+
+In order to proceed, we need to distinguish between the cases of the
+signal $x$ having real or complex value, and employ the appropriate
+version of the Isserlis Theorems.
+
+\subsection{real processes}
+
+In the event that the signal $x_n$ is real-valued and gaussian, we have
+
+\begin{eqnarray}
+\textrm{var} \; \hat{P}_1 &=& \frac{1}{N^2}\sum_{n=0}^N \sum_{m=0}^N
+\langle x_n x_n x_m x_m \rangle - P^2 \\
+&=& \frac{1}{N^2}\sum_{n=0}^N \sum_{m=0}^N \left( 
+  \langle x_n x_n \rangle \langle x_m x_m \rangle +
+  \langle x_n x_m \rangle \langle x_m x_n \rangle +
+  \langle x_n x_m \rangle \langle x_m x_n \rangle \right) \nonumber \\
+& & \rule{0.6\textwidth}{0mm} - P^2 \\
+&=&\frac{1}{N^2}\sum_{n=0}^N \sum_{m=0}^N \left( 
+  P^2 + 2 R_{nm}R_{mn} \right) - P^2 \\
+\textrm{var} \; \hat{P}_1 &=& \frac{2}{N^2}\sum_{n=0}^N \sum_{m=0}^N 
+  \left( R_{nm}R_{mn} \right) = \frac{2}{N^2}\sum_{n=0}^N \sum_{m=0}^N 
+  |R_{nm}|^2 \label{e:P1var-raw}
+\end{eqnarray}
+Here $R_{nm}$ is the expected value of the correlation $x_n x_m$.
+
+In order to proceed, we need to have some model for the correlation
+$R_{nm}$.  In two particular cases we can produce concrete
+expressions, but in general one must evaluate the implied double sum.
+
+\subsubsection{white samples}
+
+In the simplest case where the samples are white, we have $\langle x_n
+x_m \rangle = 0$ if $n \ne m$; that is
+\begin{eqnarray}
+R_{nm} &=& \delta_{nm} \langle x_n x_m \rangle \\
+      &=& \delta_{nm} \langle x_n x_n \rangle \\
+      &=& \delta_{nm} P
+\end{eqnarray}
+In this case, only the $n = m$ terms of the double sum in
+\eqref{P1var-raw} survive, and we have
+\begin{eqnarray}
+\textrm{var}\;\hat{P}_1 &=&  \frac{2}{N^2}\sum_{n=0}^N \sum_{m=0}^N 
+  \delta_{nm} P^2 \\
+  &=& \frac{2}{N^2} \sum_{n=0}^N P^2 \\
+\textrm{var}\;\hat{P}_1 &=& \frac{2}{N} P^2
+\end{eqnarray}
+This result expresses the expected result, that the variance decreases
+with the number of observations.
+
+\subsubsection{periodically sampled, stationary}
+
+In the event that $x$ is a real, stationary process, we have $R_{nm} = 
+R(n-m) = R(m-n)$.  Also, correlation functions of physical processes
+nearly always decay in some fashion over a characteristic time
+$\tau_{ac}$.  In the (frequent) occurance that we periodically observe
+a stationary process for a length time which is large compared to the
+correlation time, we can write a different expression for the
+variance of $\hat{P}_1$; for convenience define $r(n) = R(n)R(-n)$:
+
+\begin{eqnarray}
+\textrm{var}\;\hat{P}_1 &=&  \frac{2}{N^2}\sum_{n=0}^N \sum_{m=0}^N  
+R(n-m) R(m-n) \\
+&=& \frac{2}{N^2} \sum \left[ \begin{array}{cccc}
+r(0) & r(1) & \ldots & r(N-1)  \\
+r(1) & r(0) & \ldots & r(N-2) \\
+\vdots & \vdots & \ddots & \vdots \\
+r(N-2) & r(N-3) &  & r(1) \\
+r(N-1) & r(N-2) & \ldots & r(0) 
+\end{array} \right]
+\end{eqnarray}
+\begin{eqnarray}
+  &=& \frac{2}{N^2} \left(NP^2 + 2(N-1)r(1) + 2(N-2)r(2) + \cdots 2r(N-1)\right)\\
+  &=& \frac{2P^2}{N} + \frac{4}{N^2}  \sum_{n = 1}^N (N-n)r(n) \\
+  &=& \frac{2P^2}{N} + \frac{4}{N}  \sum_{n = 1}^N r(n) - \frac{4}{N^2}  \sum_{n = 0}^N n r(n)
+\end{eqnarray}
+This result collapses to the result for white samples when $R(m > 0) =
+0$, as expected.  In general there we can't say much about that sum, other than to perform it.
+However in the particular case where $|R(m)| = Pe^{-|n|\kappa}$ so that $|R(n)|^2 = r(n) = P^2
+e^{-2|n|\kappa}$ the sum can be evaluated,
+\begin{eqnarray}
+\textrm{var}\;\hat{P}_1 &=& 
+\frac{2P^2}{N}\left(2\sum_{n=0}^N e^{-2\kappa |n|} - 2\sum_{n=0}^N ne^{-2\kappa |n|} - 1\right)
+\end{eqnarray}
+\begin{equation}
+\textrm{var}\;\hat{P}_1 = \frac{2P^2}{N} \left(2\frac{1 - e^{-2\kappa N}}{1 - e^{-2\kappa}} + 
+2\frac{(N-1) e^{-2\kappa(N+1)} - Ne^{-2\kappa N} - e^{-2\kappa}}{N(1 - e^{-2\kappa})^2} - 1\right) 
+\end{equation}
+In the event that the process decorrelates rapidly, namely $\kappa \gg 1$, all the exponential terms vanish, and we have
+\begin{equation}
+\textrm{var}\;\hat{P}_1 = \frac{2P^2}{N} 
+\end{equation}
+which is the expected result for white data.
+
+It is often the case that the signal is observed for a time that is significantly longer than the correlation 
+time $1/\kappa$, such that 
+\begin{equation}
+\kappa N \gg 1 \;\;\;\; \textrm{yet} \;\;\;\; \kappa \sim 1
+\end{equation}  
+When this is the case, we can make the approximation
+\begin{equation}
+e^{-2\kappa N} \rightarrow 0
+\end{equation}
+while retaining the $\exp(-2\kappa)$ terms:
+\begin{eqnarray}
+\textrm{var}\;\hat{P}_1 &=& \frac{2P^2}{N} \left(\frac{2}{1 - e^{-2\kappa}} - \frac{  2e^{-2\kappa}}{N(1 - e^{-2\kappa})^2} - 1\right) \\
+&=& \frac{2P^2}{N} \left(\frac{1 + e^{-2\kappa}}{1 - e^{-2\kappa}} - \frac{  2e^{-2\kappa}}{N(1 - e^{-2\kappa})^2}\right)
+\end{eqnarray}
+
+If we let $\kappa \rightarrow 0$, implying long correlation time, the result simplifies further,
+
+\begin{equation}
+\textrm{var}\;\hat{P}_1 = 2\frac{P^2}{\kappa N} \left(1 - \frac{1}{2\kappa N}\right) 
+\end{equation}
+or more simply,
+\begin{equation}
+\textrm{var}\;\hat{P}_1 = 2\frac{P^2}{\kappa N} 
+\end{equation}
+
+recalling that $\kappa N$ is still large, even if $\kappa$ is small.  In this case $\kappa N < N$  becomes the effective number of samples.
+
+\subsection{white, complex processes}
+
+Returning to \eqref{P1var-raw} we now consider the case of white
+complex processes, using the appropriate complex Isserlis Theorem,
+\begin{eqnarray}
+\langle x_n x_n^\ast x_m x_m^\ast \rangle &=& 
+\langle x_n x_n^\ast \rangle\langle x_m x_m^\ast \rangle +
+\langle x_n x_m^\ast \rangle \langle x_m x_n^\ast \rangle \\
+&=& P^2 + R_{nm}R_{mn} \\
+&=& P^2 + |R_{nm}|^2
+\end{eqnarray}
+The last line is subtle.  When we construct an I/Q representation of a real
+process, the result is necessarily complex valued, but because it is a representation of
+a real process, its power spectrum is strictly non-negative definite.  This means that the 
+autocorrelation function of a real process represented in the I/Q sense has Hermite 
+symmetry, namely $R(\tau) = R^\ast(-\tau)$. 
+
+Therefore, for complex white samples we have
+\begin{equation}
+\textrm{var}\;\hat{P}_1 = \frac{1}{N} P^2
+\end{equation}
+
+The variance of the complex form appears to be half that of the real
+form; however, this can be explained by the observation that complex
+samples contain twice as much data; viewed in that sense, the
+variances are equivalent.  However, in the case of radar, because both
+real and imaginary (I and Q) samples can be made at the same time, and
+are statistically independent, there is an advantage to
+working with complex samples.
+
+\subsubsection{periodically sampled, stationary, and long observed}
+
+By similar reasoning in the real case, we can immediately conclude
+that the variance of the $\hat{P}_1$ estimator applied to complex
+data, periodically sampled, and observed for a long time, is
+\begin{equation}
+\textrm{var}\;\hat{P}_1 = \frac{1}{N} \sum_{m=0}^{\infty} |R(m)|^2
+\end{equation}
+
+If we again model the correlation function as $|R(n)| = Pe^{-\kappa|n|}$,
+then we have the elegant result for $\kappa N \gg 1$,
+\begin{eqnarray}
+\textrm{var}\;\hat{P}_1 \approx \frac{P^2}{N} \;\;\; \textrm{for} \;\;\; \kappa \gg 1 \\[1em]
+\textrm{var}\;\hat{P}_1 \approx \frac{P^2}{\kappa N} \;\;\; \textrm{for} \;\;\; \kappa \ll 1
+\end{eqnarray}
+Again, when $\kappa < 1$ then $\kappa N < N$ represents the number of independent samples of the random process.  For $\kappa = 1$ the variance
+formula becomes
+\begin{equation}
+\textrm{var}\;\hat{P}_1 \approx 1.037 \;\frac{P^2}{N} \;\;\; \textrm{for} \;\;\; \kappa = 1 \\[1em]
+\end{equation}
+showing that the process has effectively decorrelated for $\kappa$ as small as unity.
+
+
+\subsection{Signal and Noise power together}
+
+Let us now consider the case in which a particular sample $x_m$ is
+the sum of a desired signal $s_m$ and noise sample $n_m$.  Upon
+applying $\hat{P}_1$ to this data, the expected value is given as
+follows,
+\begin{eqnarray}
+\left\langle \hat{P}_1 \right\rangle &=& 
+\left\langle \frac{1}{M} \sum_{m=0}^M |s_m + n_m|^2 \right\rangle \\
+&=& \frac{1}{M} \sum_{m=0}^M \langle |s_m + n_m|^2 \rangle \\
+&=& \frac{1}{M} \sum_{m=0}^M \langle (s_m + n_m)(s_m + n_m)^\ast \rangle \\
+&=& \frac{1}{M} \sum_{m=0}^M \left( 
+   \langle s_m s_m^\ast \rangle + 
+   \langle s_m n_m^\ast \rangle + 
+   \langle n_m s_m^\ast \rangle + 
+   \langle n_m n_m^\ast \rangle \right) \label{e:psn-a} \\
+&=& \frac{1}{M} \sum_{m=0}^M \left( 
+   \langle s_m s_m^\ast \rangle + \langle n_m n_m^\ast \rangle
+ \right) \label{e:psn-b} \\
+&=& \frac{1}{M} \sum_{m=0}^M \left( P_s + P_n \right) \\
+\left\langle \hat{P}_1 \right\rangle &=& P_s + P_n
+\end{eqnarray}
+In going from \eqref{psn-a} to \eqref{psn-b} we have used the fact
+that signal and noise samples are uncorrelated.
+
+Thus the estimator $\hat{P}_1$ applied to data containing signal and
+noise power is an unbiased estimate of the sum of those powers (but a
+biased estimate of either the noise power or signal power alone).
+
+\subsubsection{variance of signal plus noise estimate}
+
+We must now characterize the quality of the estimator by considering
+its variance.
+\begin{equation} 
+\textrm{var}\;\hat{P}_1 = \frac{1}{M^2} \sum_p \sum_q 
+\left\langle (s_p + n_p)(s_p + n_p)^\ast(s_q + n_q)(s_q + n_q)^\ast 
+\right\rangle - \langle \hat{P}_1 \rangle^2
+\end{equation}
+In order to evaluate this expression, we need to consider all 16 terms
+of the expanded product.  Doing so will illustrate the combinatoric
+flavor which frequently emerges in such calculations.
+\begin{itemize}
+\item Products which include an odd number of signal terms $s$ (and
+  necessarily an odd number of noise terms $n$) will have an expected
+  value which is identically zero.  This is because application of
+  Isserlis' Theorems will always include a product which is the
+  correlation of a signal and noise, and such correlations always vanish.
+  \item Products which include either products $\langle qq \rangle$ or
+  $\langle q^\ast q^\ast \rangle$ are also necessarily null.
+\end{itemize}
+With these conditions in mind, the variance of $\hat{P}_1$ applied to
+signal and noise is as follows:
+\begin{eqnarray} 
+\textrm{var}\;\hat{P}_1 &=& \frac{1}{M^2} \sum_p \sum_q 
+  \langle s_p s_p^\ast s_q s_q^\ast \rangle
++ \langle n_p n_p^\ast n_q n_q^\ast \rangle + \nonumber \\
+& & \langle s_p s_p^\ast n_q n_q^\ast \rangle
+    + \langle n_p n_p^\ast s_q s_q^\ast \rangle
+    + \langle s_p n_p^\ast n_q s_q^\ast \rangle
+    + \langle n_p s_p^\ast s_q n_q^\ast \rangle \nonumber \\
+& & - P_s^2 - P_n^2 - 2P_s P_n 
+\end{eqnarray}
+Tracing through the steps carefully we have
+\begin{eqnarray}
+\textrm{var}\;\hat{P}_1 &=& \frac{1}{M^2} \sum_p \sum_q 
+  \langle s_p s_p^\ast s_q s_q^\ast \rangle + 
+  \langle n_p n_p^\ast n_q n_q^\ast \rangle + \nonumber \\ 
+& & P_s P_n + P_s P_n + P_s P_n \delta_{pq} + P_s P_n \delta_{pq} - \nonumber \\
+& & P_s^2 - P_n^2 - 2 P_s P_n \label{e:complexsplusn} \\
+\textrm{var}\;\hat{P}_1 &=& \frac{1}{M^2} \sum_p \sum_q 
+  (1 + \delta_{pq}) (P_s^2 + P_n^2) + 2P_s P_n \delta_{pq} 
+ - P_s^2 - P_n^2 \nonumber \\
+\textrm{var}\;\hat{P}_1 &=& \frac{1}{M^2} \sum_p \sum_q 
+  \delta_{pq} (P_s^2 + P_n^2 + 2P_s P_n) \\
+\textrm{var}\;\hat{P}_1 &=& \frac{1}{M} (P_s^2 + P_n^2 + 2P_s P_n) \\
+\textrm{var}\;\hat{P}_1 &=& \frac{1}{M} (P_s + P_n)^2 
+\end{eqnarray}
+We could have presented the last result immediately, however it was
+perhaps a useful exercise to work the steps out in detail. 
+
+When the signal is not white, we return to \eqref{complexsplusn}:
+\begin{eqnarray}
+\textrm{var}\;\hat{P}_1 &=& \frac{1}{M^2} \sum_p \sum_q 
+  P_s^2 + |R_{pq}|^2 + (1 + \delta_{pq})P_n^2 + \nonumber \\
+& & \;\;\; 2(1 + \delta_{pq}) P_s P_n - P_s^2 - P_n^2 - 2 P_s P_n \\
+&=& \frac{1}{M^2} \sum_p \sum_q 
+  |R_{pq}|^2 + \delta_{pq} P_n^2 + 2 \delta_{pq} P_s P_n 
+\end{eqnarray}
+
+It is useful to make the following definition.
+
+\deff{correlation time}{A stationary process with
+  autocorrelation function $R_{pq}$ (or $R(\tau)$) has a correlation
+  time defined empirically as
+\begin{eqnarray*}
+  \kappa &=& \lim_{M \rightarrow \infty} \frac{1}{M} \frac{1}{P^2} \sum_{pq}
+  |R_{pq}|^2 \;\;\;\; \textrm{discrete case} \\
+  \tau_{ac}&=&  \frac{1}{P^2}
+  \int_0^\infty |R(\tau)|^2 d\tau \;\;\;\; \textrm{continuous case}
+\end{eqnarray*}
+Note that $\kappa \ge 1$ for all discrete stochastic processes.}
+
+With this definition, we can write a very general and useful
+expression for the variance of $\hat{P}_1$:
+\begin{eqnarray}
+\textrm{var}\;\hat{P}_1 &=& \frac{1}{M} \left( \kappa P_s^2 + P_n^2 +
+  2 P_s P_n\right) \\
+ &=& \frac{1}{M} \left(P_s + P_n\right)^2 + \frac{\kappa - 1}{M} P_s^2
+ \\
+&=& \frac{P_t^2}{M}\left(1 + \frac{\kappa - 1}{1 +
+    \frac{1}{\textrm{SNR}^2}}\right) \;\; \ge \frac{P_t^2}{M} \\
+&=&  \frac{P_t^2}{M}\left(\frac{1 + \kappa \,\textrm{SNR}^2}{1 +
+    \textrm{SNR}^2}\right) \;\; \ge \frac{P_t^2}{M}
+\end{eqnarray}
+In the last expression we have made use of the definition $P_t = P_s +
+P_n$, as well as the signal to noise ratio SNR $=P_s/P_n$.  Note that
+there is a hard lower bound on the variance.
+
+Expressed in words, the variance of $\hat{P}_1$ is always at least as
+great as $P_t^2/M$; it can be enhanced above this value if the signal
+process has a large correlation time and a sufficiently large signal
+to noise ratio. 
+
+\section{Nonlinear Estimators}
+
+Some parameters that we wish to estimate are intrinsically nonlinear,
+and thus require care in their analysis.  We will introduce the
+challenge with an artificial yet instructive example: the
+``quietness'' estimator, which is intended to produce an estimate of
+the inverse power in a signal. 
+
+\subsection{Inverse Power}
+
+Let us invent and analyze an estimator $\hat{Q}$ of the inverse power,
+with the goal that it be unbiased, namely 
+\begin{displaymath}
+\langle \hat{Q} \rangle = \frac{1}{P}
+\end{displaymath}
+
+Two different estimators suggest themselves:
+\begin{eqnarray}
+\hat Q_1 &=& \frac{1}{N} \sum_n \frac{1}{|x_n|^2} \\
+\hat Q_2 &=& \frac{1}{\hat P_1} = \frac{1}{\frac{1}{N} \sum_n |x_n|^2}
+\end{eqnarray} 
+We shall see that $\hat Q_1$ is unbiased, but terrible, in the sense
+of having enormous variance.  On the other hand, $\hat Q_2$ is biased,
+but consistent.
+
+\subsubsection{evaluation of $Q_1$}
+
+Let us first find (or at least approximate) the expected value of
+$\hat{Q}_1$.   Notice that
+\begin{displaymath}
+y = \frac{1}{x} \;\;\; \rightarrow \;\;\; \frac{1}{|x|^2} = yy^\ast
+\end{displaymath}
+and $y$ is no longer a gaussian random variable.   We'll need to
+compute
+\begin{eqnarray}
+\left\langle \left| \frac{1}{x} \right|^2 \right\rangle &=&
+\frac{1}{\sqrt{2\pi} \sigma} \int_{-\infty}^\infty
+\left|\frac{1}{x}\right|^2 \exp\left(-\frac{x^2}{2\sigma^2}\right) \;
+dx \\
+&=& \frac{2}{\sqrt{2\pi} \sigma} \int_{0}^\infty
+\left|\frac{1}{x}\right|^2 \exp\left(-\frac{x^2}{2\sigma^2}\right) \;
+dx\\
+&=& \frac{2}{\sqrt{2\pi} \sigma^2} \frac{1}{\sqrt{8}} \int_{0}^\infty
+s^{-3/2} e^{-s} \; ds \\
+&=&\frac{2}{\sqrt{2\pi} \sigma^2} \frac{1}{\sqrt{8}}
+\Gamma\left(-\frac{1}{2}\right) \\
+&=&\frac{2}{\sqrt{2\pi} \sigma^2} \frac{1}{\sqrt{8}}
+(-2\sqrt{\pi})\\
+&=& \frac{-1}{\sigma^2}
+\end{eqnarray}
+Notice that the expected value of the power is negative.  This is (of
+course) impossible.  It has to do with the formal definition of the
+Gamma Function for negative argument values.  We could fool around
+with this for a while, but essentially what is happening is that the
+mean value is hard to find reliably.
+
+More meaningfully we can do a quick numerical experiment (in
+Matlab/Octave) to show that this is a hopeless estimator:
+\begin{verbatim}
+> x = randn(1,10000);
+> z = 1./(x.*x);
+> mean(z);
+1264.1
+> median(z);
+2.2114
+\end{verbatim}
+This shows that the mean of the estimator is dramatically removed from
+the value that we want, and even the median (which is known to be a
+robust\footnote{see appendix XXX} estimator of central tendency) is
+pretty far away from the unbiased value that we hope for, 1.0.
+
+Thus $\hat{Q}_1$ is a terrible estimator of the inverse power.
+
+\subsubsection{evaluation of $Q_2$}
+
+On the other hand $\hat{Q}_2$ will show a bit more promise, although
+we will have to wade through some algebra to figure out how it
+behaves.  Our approach will require a perturbation expansion/Taylor
+series approach.
+
+Consider the following decomposition of the data,
+\begin{eqnarray}
+\langle x_n x_m^\ast \rangle &=& R_x(n-m) \\
+x_n x_m^\ast &=& R_x(n-m) + \epsilon_{nm} \\
+\textrm{where} \;\;\; \langle \epsilon_{nm} \rangle &=& 0 \\
+\textrm{and} \;\;\; x_n x_n^\ast &=& P + \epsilon_{nn} 
+\end{eqnarray}
+Now we can start to evaluate $\hat{Q}_2$.
+\begin{eqnarray}
+\hat{Q}_2 &=& \frac{1}{\hat{P_1}} \\
+&=& \frac{1}{\frac{1}{N}\sum_p x_p x_p^\ast} \\
+&=& \frac{1}{\frac{1}{N}\sum_p (P + \epsilon_{pp})} \\
+&=& \frac{1}{P + \frac{1}{N}\sum_p \epsilon_{pp}} \\
+&=& \frac{1}{P}\left(\frac{1}{1 + \sum_p \frac{\epsilon_{pp}}{NP}}\right) \\
+&=& \frac{1}{P}\left(1 -  \sum_p  \frac{\epsilon_{pp}}{NP} + 
+\sum_p \sum_q  \frac{\epsilon_{pp}}{NP} \frac{\epsilon_{qq}}{NP} +
+\cdots \right) \\
+%
+\left\langle \hat{Q}_2 \right\rangle &=& \frac{1}{P} \left( 1 - 
+\sum_p  \frac{\langle \epsilon_{pp}\rangle}{NP} + 
+\sum_p \sum_q  \frac{\langle \epsilon_{pp} \epsilon_{qq}\rangle}{(NP)^2} +
+\cdots \right) \\
+&=& \frac{1}{P} \left( 1 + \sum_p \sum_q  \frac{\langle \epsilon_{pp} \epsilon_{qq}\rangle}{(NP)^2} +
+\cdots \right) 
+\end{eqnarray}
+Now we need to figure out that four corellation ...
+\begin{eqnarray}
+\langle \epsilon_{pp} \epsilon_{qq} \rangle &=& 
+\langle (x_p x^\ast_p - P) (x_q x^\ast_q - P) \rangle \\
+\langle \epsilon_{pp} \epsilon_{qq} \rangle &=& 
+\langle (x_p x^\ast_p x_q x^\ast_q) - P x_p x^\ast_p - P x_q x^\ast_q + P^2 \rangle \\
+&=& \langle (x_p x^\ast_p x_q x^\ast_q)\rangle - P^2 \\
+&=& \langle x_p x^\ast_p \rangle \langle x_q x^\ast_q \rangle
++\langle x_p x^\ast_q\rangle \langle x_q x^\ast_p \rangle - P^2 \\
+&=& P^2 + |R_{pq}|^2 - P^2 \\
+&=& |R_{pq}|^2
+\end{eqnarray}
+So we can now evaluate the expected value of $\hat{Q}_2$:
+\begin{eqnarray}
+\hat{Q}_2 &=& \frac{1}{P} \left( 1 + \sum_p \sum_q \frac{\langle
+    \epsilon_{pp} \epsilon_{qq}\rangle}{(NP)^2} + \cdots \right)
+\nonumber \\
+&=& \frac{1}{P} \left(1 + \sum_p \sum_q \frac{|R_{pq}|^2}{(NP)^2} +
+  \cdots \right) \\
+&=& \frac{1}{P} \left(1 + \sum\sum_{p=q} \frac{|R_{pq}|^2}{(NP)^2} +
++ 2\sum\sum_{p>q} \frac{|R_{pq}|^2}{(NP)^2} 
++ \cdots \right) \\
+&=& \frac{1}{P} \left(1 
++ \frac{1}{N} 
++ 2\sum\sum_{p>q} \frac{|R_{pq}|^2}{(NP)^2} + \cdots \right) 
+\end{eqnarray}
+
+Let's use as a model for $|R_{pq}| \sim P\exp(-|p-q|/\kappa)$. 
+\begin{eqnarray}
+\hat{Q}_2 &=& \frac{1}{P} \left(1 + \frac{1}{N} 
++ \frac{2}{N} e^{-2/\kappa}\sum_{p=0}^\infty e^{-2p/\kappa} + \cdots
+\right) \\
+ &=& \frac{1}{P} \left(1 + \frac{1}{N} 
++ \frac{2}{N} \frac{e^{-2/\kappa}}{1 - e^{-2/\kappa}} + \cdots \right)
+\\
+&=& \frac{1}{P} \left(1 + \frac{1}{N} \frac{1 + e^{-2/\kappa}}{1 -
+    e^{-2/\kappa}} + \cdots \right)\\
+&=& \frac{1}{P} \left(1 + \frac{1}{N} \coth(1/\kappa) +  \cdots  \right) \\
+&\sim& \frac{1}{P}\left\{\begin{array}{ll}
+1 + \frac{\kappa}{N} & \kappa \gg 1 \\[0.5em]
+1 + \frac{1}{N} & \kappa \ll 1
+\end{array} \right. \\
+&\sim& \frac{1}{P}\left(1 + \frac{1 + \kappa}{N}\right) \;\;\; \forall
+\; \kappa
+\end{eqnarray}
+Thus, $\hat{Q}_2$ is biased, but at least well behaved.  Although it
+it biased, it is \textit{consistent}, in that the amount of bias
+vanishes as $N \rightarrow \infty$.
+
+We haven't shown this, but the next correction in the expressions
+above scales as $1/N^2$.
+
+\vspace{1em}
+
+\noindent \textbf{A rule of thumb: reasonable estimators will
+work well if the target is observed for times much larger than the
+target decorellation time.}
+
+
+\subsection{Signal to Noise Ratio}
+
+Now we can approach the Signal to Noise Ratio estimator.
+\begin{eqnarray}
+\widehat{\textrm{SNR}} &=& \frac{\hat{P}_1|_{s+n} - \hat{P}_1|_n}{\hat{P}_1|_n} \\
+&=& \frac{\hat{P}_1|_{s+n}}{\hat{P}_1|_n} - 1
+\end{eqnarray}
+If the numerator and denominator use independent samples ($N$ for the
+numerator, and $M$ for the denominator), then we can compute expected
+value of the SNR estimator quickly,
+\begin{eqnarray}
+\left\langle \widehat{\textrm{SNR}} \right\rangle &=& \left\langle
+  \hat{P}_1|_{s+n} \right\rangle \left\langle
+  \frac{1}{\hat{P}_1|_n}\right\rangle - 1 \\
+&=& (P_s + P_n) \frac{1}{P_n}(1 + \frac{1}{N}) - 1 \\
+&=& \frac{P_s + P_n}{P_n}\left( 1 + \frac{1}{N}\right) - 1 \\
+&=& \left(\frac{P_s}{P_n} + 1 \right)\left(1 + \frac{1}{N}\right) - 1
+\\
+&=& \frac{P_s}{P_n}\left(1 + \frac{1}{N}\right) +\frac{1}{N} \\
+&=& \textrm{SNR}\left(1 + \frac{1}{N}\right) +\frac{1}{N} \\
+&=& \textrm{SNR} + \frac{1}{N}(1 + \textrm{SNR}) 
+\end{eqnarray}
+Thus, the SNR estimator (as presented) is always biased; however it is
+consistent because the bias vanishes as $N\rightarrow \infty$.
+
+\subsubsection{variance of the SNR estimator}
+
+We should still estimate the quality of the SNR estimator by computing
+its variance:
+\begin{eqnarray}
+\textrm{var } \widehat{\textrm{SNR}} &=& \left\langle
+  \widehat{\textrm{SNR}} \;\;\widehat{\textrm{SNR}}\right\rangle -\left (\textrm{SNR} + \frac{1}{N}(1 + \textrm{SNR})\right)^2
+\end{eqnarray}
+
+\section{Estimation of Correlation}
+
+Estimates of correlation will prove to be extremely useful for radar
+remote sensing of deep, overspread targets.  Let's begin with a basic
+estimator of correlation of Inphase/Quadrature data $x[n]$ which is
+periodically sampled with sample period $\tau$.
+\begin{eqnarray}
+\hat{R}_{xx}(m) &=& \frac{1}{N} \sum_{p=0}^{N-1} x[p] x^\ast[p-m] \\
+\left\langle \hat{R}_{xx}(m) \right\rangle &=& \frac{1}{N}
+\sum_{p=0}^{N-1} \left\langle x[p] x^\ast[p-m] \right\rangle \\
+&=& \frac{1}{N} \sum_{p=0}^{N-1} R_{xx}(m) \\
+&=& R_{xx}(m)
+\end{eqnarray}
+Thus, the autocorrelation estimator is unbiased.  Unlike the power
+estimator $\hat{P}_1$ the autocorrelation estimator is also unbiased
+in the presence of noise; let $x[p] = s[p] + n[p]$:
+\begin{eqnarray}
+\left\langle \hat{R}(m) \right\rangle &=& \frac{1}{N}
+\sum_{p=0}^{N-1} \left\langle (s[p] + n[p]) (s[p-m] + n[p-m])^\ast \right\rangle \\
+&=& \frac{1}{N} \sum_{p=0}^{N-1} \langle s(p)s^\ast(p-m)\rangle
++\langle s(p)n^\ast(p-m)\rangle +  \\ \nonumber 
+& & \;\;\;\;\;\;\;\;\;\;\;\;\langle n(p)s^\ast(p-m)\rangle +\langle n(p)^\ast(p-m)\rangle\\
+&=&  \frac{1}{N} \sum_{p=0}^{N-1} R(m) + 0 + 0 + 0 \\
+&=& R_{xx}(m)
+\end{eqnarray}
+The latter result occurs because
+\begin{itemize}
+\item Signals are (always) uncorrelated with noise.
+\item White noise is uncorrelated with delayed versions of itself.
+\end{itemize}
+
+Now we should estimate the variance of the correlation estimate.
+\begin{eqnarray}
+\textrm{var}\hat{R}(m) &=& \left\langle \hat{R}(m)\hat{R}^\ast(m) -
+  R_{xx}(m) R^\ast_{xx}(m)\right\rangle \\
+&=& \left\langle \hat{R}(m)\hat{R}^\ast(m) \right\rangle - R_{xx}(m)
+R^\ast_{xx}(m) \\
+&=& \frac{1}{N^2}
+\sum_{p=0}^{N-1}\sum_{q=0}^{N-1} \left\langle x[p] x^\ast[p-m]
+  x^\ast[q] x[q-m] \right\rangle - R_{xx}(m) R^\ast_{xx}(m) \\
+&=& \frac{1}{N^2}\sum_{p=0}^{N-1}\sum_{q=0}^{N-1} \langle x[p]
+x^\ast[p-m]\rangle\langle x^\ast[q] x[q-m] \rangle +\langle x[p]
+x^\ast[q]\rangle\langle x^\ast[p-m] x[q-m] \rangle \nonumber \\
+& &- R_{xx}(m) R^\ast_{xx}(m) \\
+&=&  \frac{1}{N^2}\sum_{p=0}^{N-1}\sum_{q=0}^{N-1}  \left(R_{xx}(m)
+R^\ast_{xx}(m) - \delta_{pq} |R(0)|^2\right) -  \left(R_{xx}(m)
+R^\ast_{xx}(m) \\
+&=& \frac{1}{N}P^2 = \frac{1}{N} \left(P_s^2 + P_n^2\right)
+\end{eqnarray}
+
+Thus, the variance of the correlation estimate depends upon the total
+power in the signal plus the noise.  This estimate is correct for the
+case in which there is a single isolated target.  However this is not
+the correct result for the case of the ``double pulse'' waveform.

@@ -1,0 +1,270 @@
+\chapter{Phase Codes for Underspread Targets}
+
+Phase codes present a powerful means for modifying the ambiguity of
+simple pulses.   The central idea is that the ``tent'' of a long
+square pulse can be collapsed with an intricate phase coding, yielding
+a more compact range resolution.  
+
+For the most part, phase codes are considered from the viewpoint of
+range clutter only, neglecting the Doppler component of the ambiguity
+function.  These codes are very useful, but are most effective for
+targets whose Doppler content evolves much less rapidly than the radar
+waveform.
+
+\section{Barker Codes}
+
+In 1953 Barker\cite{barker-1953} developed a simple class of codes for
+automatic synchronization of communications systems.  The basic idea
+was to identify code sequences consisting of $+$ and $-$ phases which
+produced a very sharp ACF peak with low delay sidelobes.  The best you
+can do with binary phase codes is to accept sidelobes of $0$ (for even
+lags) or $\pm 1$ for odd lags.  There are a finite number of such
+codes, and all of them are given in \tabref{barker}.
+
+
+\begin{table}
+\caption{\label{t:barker} List of all Barker codes.  Note that if $c$
+  is a Barker code, then so is $-c$, as well as the time reversal of $c$.}
+\begin{center}
+\begin{tabular}{rl}
+length & pattern \\ \hline
+2      & $++$, \rule{1em}{0mm} $+-$ \\
+3      & $++-$ \\
+4      & $+++-$,  \rule{1em}{0mm} $++-+$ \\
+5      & $+++-+$ \\
+7      & $+++--+-$ \\
+11     & $+++---+--+-$ \\
+13     & $+++++--++-+-+$
+\end{tabular}
+\end{center}
+\end{table}
+
+The limited number of such codes is an interesting mathematical
+curiosity, but not really a practical one as we shall see later in the
+discussion of random codes.  
+
+The proof mechanisms for the non-existence of long Barker codes is
+interesting, and (somewhat surprisingly) rests upon the periodic
+correlation functions of these explicitly aperiodic codes.   Among
+other things, it becomes clear that long codes of length $4n+1,
+4n+2,4n+3$ are easily ruled out, and we learn that the odd length
+codes must have range sidelobes of the same sign.  Codes of length
+$4n$, however, require considerably more effort to prove their
+existence (or nonexistence), partly because of their possible
+alternating sidelobe signs.
+
+It appears that the existence or non-existence of Barker codes of
+length $4n$ remains open in the mathematical sense.  However, in the
+practical sense the matter is closed.  It is known that there are no
+additional Barker codes of length less than 200 or so.  A Barker code
+of length 64 would be useful; a Barker code of length $2^{16}$ would
+not be useful, because of transmitter bandwidth and other
+considerations.
+
+There are, however, longer codes with low range sidelobes that are
+useful, such as the ``almost Barker Code'', of length 28, which has 9
+range sidelobes of magnitude 2, the rest being 1 or 0
+\cite{gray+farley-1973} \footnote{Radio Science, v8 no. 2, pp 123-131,
+  feb 1973}
+\begin{center}
+$++-++-+--+---+---+---++++---$
+\end{center}
+
+% \clearpage
+
+\section{Complementary Codes}
+
+Consider the pair of 4-baud Barker Codes $+++-$ and $++-+$.  If you
+compute and plot their autocorrelation functions, you'll notice that
+the pattern of sidelobes has opposite sign (except for the central
+peak).  Thus, if we interrogate a (constant) target first with one
+pulse, then with the second, and add the two results point by point, a
+``perfect'' pulse compression is obtained with zero amplitude
+sidelobes.
+
+Although 4-baud complementary codes are marginally useful, it is easy
+to create much longer codes using the following theorem:
+
+\begin{quote}
+If $A$, $B$ are a complementary code pair, then the concatenated codes
+$AB, A\bar{B}$ are also complementary (where the overbar indicates
+changing the sign of each bit).
+\end{quote}
+
+Using this formula it is easy to create very long codes (and you can
+observe that the 4-baud codes are the extension of the two 2-baud
+codes).  However codes created in this fashion are usually suboptimal
+in that their individual sidelobes can be fairly large, thus requiring
+more precision in cancellation to achieve the perfect composite result.
+
+Thus, in general some sort of search is required to find good, long
+complementary codes.
+
+\section{Polyphase Codes}
+
+You can make polyphase versions of Barker Codes, too.  These can be
+much longer than the biphase codes.  Six-phase codes are used in some
+aerospace applications.
+
+\section{M-sequences}
+
+There is a large class of nearly perfect binary phase codes known as
+M-sequences (``maximal length'') or PN-sequences (``pseudo noise'').
+In contrast to the Barker Codes, the M-sequences exist for large
+length (indeed for any length $M = 2^N - 1$, for positive integer
+$N$).   The M-sequences share the nice autocorrelation property of the
+Barker code in the cyclic as apposed to acyclic sense.  Thus when we
+compute the range sidelobes via autocorrelation we have
+\begin{equation}
+\chi(\tau,0) = \sum_{k=0}^{k < N} c_k c_{k-\tau}
+\end{equation}
+and it is understood that either the subscripts of $c$ are computed
+modulo $N$ or equivalently that the code is periodic with period $N$,
+$c_k = c_{k+N}$.
+
+The periodicity of the codes implies that they are 100 percent
+duty-cycle --- this is a CW modulation scheme, implying that the radar
+using these waveforms must be bistatic, although McEliece has
+suggested that the waveforms actually work well aperiodically.
+
+The construction of the codes is a direct, novel application of a
+topic in abstract algebra, the Galois Fields arising from prime
+polynomials modulo 2.  As a practical matter the codes are extremely
+easy to generate in digital logic consisting of shift registers and
+EXOR gates.  As an example, consider \figref{mseq1}, which shows a
+shift register implementation associated with the polynomial $x^3 + x
++ 1 = 0$.
+
+The shift register state stores the sequence $x^n$ which has been
+reduced modulo the polynomial $x^3 + x + 1$, with coefficients
+evaluated modulo two.  Thus we have
+\begin{equation}
+\begin{array}{lclclcl}
+1 \\
+x \\
+x^2 \\
+x^3 &\equiv& x+1 \\
+x^4 &      & x^2 + x \\
+x^5 &      & x^3 + x^2 &\equiv& x^2 + x + 1 \\
+x^6 &      &           &      & x^3 + x^2 + x &\equiv&x^2 + 1 \\
+x^7 &      &           &      &               &  &x^3 + x \equiv 1
+\end{array}
+\end{equation}
+Thus we can see that $x^7 \equiv 1$ modulo $x^3 + x + 1$, which means
+(of course) that $x^{7n} \equiv 1$.  The M-sequences are formed by
+examining the coefficients of any bit; if we examine the 1s place, we
+have $1001011$.  Mapping $1$ to $+$ and $0$ to $-$ we achieve a
+biphase code with nearly ideal cyclic autocorrelation: the zero lag
+has value $N$ and all other lags have value $-1$.
+
+A little experimentation reveals that the sequence generated by
+multiplying one M-sequence by a delayed copy is itself the same
+M-sequence with a third shift.  Also, one can see that the M-sequences
+have exactly one more $1$ than $0$.  Assembling these facts leads to
+the strong correlation properties of the M sequences.
+
+\begin{figure}
+\centerline{\epsfxsize=0.6\textwidth \epsffile{mseq-sr.eps}}
+\caption{\label{f:mseq1} This shift register circuit generates an M
+sequence based on the polynmial $x^3 + x + 1 = 0$, which can be
+rearranged (modulo $2$) to be $x^3 = 1 + x$.  The m-sequence arises
+from the ``ones'' place of the shift register system, $\ldots 1001011\ldots$.}
+\end{figure}
+
+It is quite fortunate that prime polynomials modulo 2 exist for all
+orders of polynomials.  Thus, unlike Barker codes arbitrarily long
+M-sequences can be found (although not for all lengths).
+
+The underlying polynomials are ``prime'' which means that they have no
+factors except themselves and unity.  Of course, this factorization is
+to be performed with coefficients modulo 2.  Thus, the polynomials $x$
+and $x + 1$ are prime, although $x^2 + 1$ is not since it is the
+square of $x+1$ (modulo 2).  A beginning table of prime polynomials
+can be found in \tabref{ppolys}.  This table is not exhaustive, it's
+just an indication of some primes.  None of the entries are really
+large enough to use; in practice primes of order 10, giving sequences
+of length 1023 begin to be useful.  A prime polynomial of order 48 is
+embedded in the Global Positioning System algorithms; it is evaluated
+each microsecond, and its period is thus (8.9 years).  The Qualcomm
+CDMA protocol uses a generalization of m-sequences called ``Gold
+codes'' \cite{uppala-1998,gold-1967,gold-1968} to permit several users
+to share a single channel.
+
+\begin{table}
+\caption{\label{t:ppolys} A beginning table of prime polynomials
+modulo 2.  The polynomials exist for all orders, and there are many of
+them.  Polynomials of any particular order need only be tested by
+primes of half order or smaller; also, a complete table can be built
+using ``sieve'' methods.  As in the conventional natural primes, there
+is no pattern which permits easy testing or generation of large primes.}
+\centerline{\begin{tabular}{rl}
+order & polynomials \\ \hline
+1     & $x, x+1$ \\
+2     & $x^2 + x + 1$ \\
+3     & $x^3 + x + 1, x^3 + x^2 + 1$ \\
+4     & $x^4 + x + 1, x^4 + x^3 + 1$ \\
+5     & $x^5 + x^2 + 1, x^5 + x^3 + 1, x^5 + x^3 + x^2 + x + 1, \ldots$ \\
+6     & $x^6 + x + 1, x^6 + x^3 + 1, \ldots$
+\end{tabular}}
+\end{table}
+
+\section{Random Codes}
+
+\subsection{Completely Random Codes}
+
+If we contemplate the idea that good radar codes have an
+autocorrelation function which resembles a delta function, we may
+recall that white random processes also have a compact autocorrelation
+function.  
+
+A random sequence of $N$ $\pm 1$ bits will yield an autocorrelation
+function with a zero lag height of $N$, with the typical sidelobe at
+lag $n \ne 0$ having height $1/\sqrt{N-n}$.  Although this is not
+particularly good, neither is it particularly bad.  Furthermore, such
+codes will generally have good performance in the whole range-Doppler
+ambiguity plane.
+
+\subsection{Exhaustive Search}
+
+In principle, one could simply examine all codes of length $N$ to find
+which perform the best.  However, this method rapidly collapses in the
+face of exponential reality, and the opportunity for finding long
+codes through exhaustive search is probably vanishingly small.
+
+\subsection{Optimized Random Codes}
+
+One can get improved random codes by creating many of them, and
+picking those which yield the best ambiguity properties.  Suppose we
+invent a metric $M$ for goodness of a code $x_n$ with autocorrelation
+$R_{xx}(n)$, such as 
+\begin{equation}
+M(x) = \sum_n |R_{xx}(n)|
+\end{equation}
+We can then create a population of codes and pick the best performer
+from them.
+
+Something a bit stronger can be done as well.  If we consider a metric
+for code performance, then the shape of the manifold over all possible
+codes is almost certainly a very bumpy, irregular surface.  Although
+there is little structure locally, globally there will be some
+noticable trends.  For example, the waveform which is all $+$ will
+have a poor ambiguity, as will the waveform of alternating $+-$
+phases.  If we can create a search process which preserves
+``randomness'' but includes ``nearness'' then we may be able to find
+good codes without wasting time in regions where only poor codes
+exist.
+
+Techniques which automate this process are widely used, and fall under
+the general rubric of ``stochastic optimization.''  What one gives up
+in analytic and definitive results can be regained through performance
+specifications which would be difficult or impossible to express
+analytically.  Sahr and Grannan\cite{sahr+grannan-1993} used the
+technique of ``simulated annealing'' to design several long binary
+phase codes with interesting correlation properties which would have
+been extremely difficult to find by construction or exhaustive
+search.  In particular they described a ``hurricane'' code for which
+Barker-like performance was desired, but only for the innermost lags,
+and ``quasi-orthogonal'' code pairs which individually behaved like
+Barker codes, but whose cross-correlations were small.
+
+

@@ -1,0 +1,249 @@
+\typeout{BLHABAALSDKJAFSALKFJSAFLKJASLJFLJALKFJDLASFLJK}
+
+\chapter{Detection}
+
+Useful operation of a radar requires the detection of known signals.
+These signals may be simple pulses, pure tones, or intricately coded,
+or even random.  These signals are known, or, in the case of passive
+radar, there should be some independent way of deducing what they were 
+
+If the transmitted signal is $s(t)$, then we will be interested in
+discovering the amplitude $a$, delay $\tau$, and Doppler Shift $v$ in
+the presence of noise $n(t)$, in a received signal.  Of course
+additional signal properties are of interest, such as the angle of
+arrival, angular image, but these properties are derived from spatial
+information --- a vector of signals --- and we'll begin by considering
+a simple scalar signal.
+
+\section{Narrowband Signal}
+
+We will find it very convenient to work with a narrowband
+representation of radar signals.  As a practical matter the actual
+radiated signal will be a real-valued signal of the following form
+\begin{equation} \label{e:realmodel0}
+y(t) = s(t) \cos[2 \pi f_0 t + \phi(t)]
+\end{equation}
+where the signal has some amplitude modulation $a(t)$ and phase
+modulation $\phi(t)$ and a carrier frequency $f_0$.  An alternative
+formulation would be 
+\begin{equation}
+y(t) = \Re\left[\tilde{s}(t) \exp(2\pi j f_0 t)\right]
+\end{equation}
+where we now include the phase modulation into a complex amplitude
+$s(t)$.  This permits very convenient incorporation of amplitude and
+phase changes, delays, and Doppler shifts:
+\begin{equation}
+y(t) = \Re\left[a \tilde{s}(t - \tau) \exp(2\pi j f_0 (t-\tau)) \exp(2\pi j \nu
+  (t-\tau))\right]
+\end{equation}
+In fact, we can let the signal $\tilde{y}(t)$ be complex,
+\begin{equation} \label{e:analyticmodel0}
+\tilde{y}(t) = a\;\tilde{s}(t - \tau) \exp(2\pi j f_0 (t-\tau)) \exp(2\pi j \nu  (t-\tau))
+\end{equation}
+One problem with this signal is that the imaginary part of
+$\tilde{y}(t)$ has not been specified.  The usual response is to
+constrain the imaginary part of $\tilde{y}(t)$ so that the whole
+signal spectrum has identically zero content for negative frequencies.
+Such a signal is denoted the ``analytic signal'' in communications
+literature \cite{vantrees,whalen,helstrom}.  Given a real signal
+$s(t)$, the Hilbert Transform creates the appropriate imaginary part
+to create an analytic signal.
+
+\begin{factoid}
+The Matlab function {\protect\texttt{hilbert(x)}} returns the analytic signal
+$\tilde{x}$ given a real signal $x$.
+\end{factoid}
+
+Suppose that the spectrum of $\tilde{S}$ is entirely bounded within
+$\pm f_s$, and further suppose that $f_s \ll f_0$.  Then such a
+signal is said to be ``narrowband'' because the spectral width is much
+less than the center frequency.  The Nyquist Rate of the signal $s$ is
+$2 f_s$, the full bandwidth of the signal, including the negative
+spectral content.
+
+\begin{factoid} All radio broadcast signals are narrowband signals.
+   FM channels have (full) bandwidth 200 kHz at a center frequency of
+   100 MHz; AM channels have a (full) bandwidth of about 20 kHz at 1
+   MHz.  In both cases the signal bandwidth is only 2 percent of the
+   center frequency.
+\end{factoid}
+
+In the discussion of bandwidth above, the Doppler frequency shift
+$\nu$ was not mentioned.  In general, the maximum Doppler Shift
+$\nu_{max}$ is usually smaller than the radar signal bandwidth $f_s$.
+Exceptions do exist, such as pure CW illuminators with very low
+bandwidth.
+
+\section{The IQ Receiver}
+
+When we wish to receive and process narrowband signals, a particularly
+convenient receiver is available which produces a signal which is very
+nearly ``analytic.''  It is possible to build finite impulse response
+(FIR) processors which can produce an approximation of the Hermite
+Transform, but a somewhat different method is used in practice.
+
+First, we can rewrite \eqref{analyticmodel0} as follows:
+\begin{equation}
+y(t) = \Re\{ \tilde{y}(t) \} = 
+            \frac{1}{2}\left[\tilde{y}(t) + \tilde{y}^\ast(t)\right] 
+\end{equation}
+Now, let us ``down convert'' by multiplying $y(t)$ by the conjugate
+carrier signal $\exp(-2\pi j f_0 t)$,
+\begin{eqnarray}
+e^{-2\pi j f_0 t} y(t) &=&
+\frac{1}{2} \left(
+  a \tilde{s}(t - \tau) e^{2\pi j \nu t} e^{- 2\pi j (f_0 + \nu) \tau}
+  \; + \right.  \nonumber
+\\
+& & \;\;\;\;\;\; \left.a^\ast \tilde{s}^\ast(t - \tau) e^{-2\pi j \nu t} 
+   e^{2\pi j(f_0 + \nu) \tau} e^{-4\pi j f_0 t} \right)
+\end{eqnarray}
+Note that the first term has only low frequency content, while the
+second term has been shifted to high (negative) frequency.  If we
+apply a low pass filter which slices off the high (negative)
+frequencies, we will be left with the ``baseband signal'' $y_b(t)$,
+\begin{eqnarray}
+y_b(t) &=& {\cal L}\{e^{-2\pi j f_0 t} \tilde{y}(t)\} \\
+       &=& \frac{1}{2}a \tilde{s}(t - \tau) e^{2\pi j \nu (t-\tau)} e^{- 2\pi
+       j f_0 \tau} 
+\end{eqnarray}
+Thus the signal $y_b(t)$ is directly proportional to the complex
+modulation, scaled by the scattering amplitude $a$ and a phase factor
+$\exp(-2\pi j f_0 \tau)$, which in general can not be determined but
+will usually be unimportant anyway.
+
+Now the baseband signal $y_b(t)$ is complex valued, and it would be
+reasonable to object.  Nevertheless this signal is perfectly
+realizable by simply permitting $y_b(t)$ to be decomposed into real
+and imaginary parts, each part being real valued.
+
+NEED FIGURE, NEED MORE TEXT
+
+\section{The Matched Filter}
+
+Let us initially consider the detection of a signal which is neither
+delayed nor Doppler shifted, but whose amplitude $a$ is unknown.  The
+received signal will be processed by conversion to baseband, and then
+passed through a filter with some impulse response $h(t)$.  The result
+is a new signal $r(t)$,
+\begin{eqnarray}
+r(t) &=& h(t) \ast (y(t) + n(t)) \\
+     &=& \int_0^\infty h^\ast(t') [y(t-t') + n(t-t')]\; dt'
+\end{eqnarray}
+
+
+
+
+
+\chapter{Introduction}
+
+\noindent {\Huge P}hase codes present a powerful means for modifying
+the ambiguity of simple pulses.  
+
+\section{Barker Codes}
+
+\newpage
+
+\section{M-sequences}
+
+There is a large class of nearly perfect binary phase codes known as
+M-sequences (``maximal length'') or PN-sequences (``pseudo noise'').
+In contrast to the Barker Codes, the M-sequences exist for large
+length (indeed for any length $M = 2^N - 1$, for positive integer
+$N$).   The M-sequences share the nice autocorrelation property of the
+Barker code in the cyclic as apposed to acyclic sense.  Thus when we
+compute the range sidelobes via autocorrelation we have
+\begin{equation}
+\chi(\tau,0) = \sum_{k=0}^{k < N} c_k c_{k-\tau}
+\end{equation}
+and it is understood that either the subscripts of $c$ are computed
+modulo $N$ or equivalently that the code is periodic with period $N$,
+$c_k = c_{k+N}$.
+
+The periodicity of the codes implies that they are 100 percent
+duty-cycle --- this is a CW modulation scheme, implying that the radar
+using these waveforms must be bistatic, although McEliece has
+suggested that the waveforms actually work well aperiodically.
+
+The construction of the codes is a direct, novel application of a
+topic in abstract algebra, the Galois Fields arising from prime
+polynomials modulo 2.  As a practical matter the codes are extremely
+easy to generate in digital logic consisting of shift registers and
+EXOR gates.  As an example, consider \figref{mseq1}, which shows a
+shift register implementation associated with the polynomial $x^3 + x
++ 1 = 0$.
+
+The shift register state stores the sequence $x^n$ which has been
+reduced modulo the polynomial $x^3 + x + 1$, with coefficients
+evaluated modulo two.  Thus we have
+\begin{equation}
+\begin{array}{lclclcl}
+1 \\
+x \\
+x^2 \\
+x^3 &\equiv& x+1 \\
+x^4 &      & x^2 + x \\
+x^5 &      & x^3 + x^2 &\equiv& x^2 + x + 1 \\
+x^6 &      &           &      & x^3 + x^2 + x &\equiv&x^2 + 1 \\
+x^7 &      &           &      &               &  &x^3 + x \equiv 1
+\end{array}
+\end{equation}
+Thus we can see that $x^7 \equiv 1$ modulo $x^3 + x + 1$, which means
+(of course) that $x^{7n} \equiv 1$.  The M-sequences are formed by
+examining the coefficients of any bit; if we examine the 1s place, we
+have $1001011$.  Mapping $1$ to $+$ and $0$ to $-$ we achieve a
+biphase code with nearly ideal cyclic autocorrelation: the zero lag
+has value $N$ and all other lags have value $-1$.
+
+A little experimentation reveals that the sequence generated by
+multiplying one M-sequence by a delayed copy is itself the same
+M-sequence with a third shift.  Also, one can see that the M-sequences
+have exactly one more $1$ than $0$.  Assembling these facts leads to
+the strong correlation properties of the M sequences.
+
+\begin{figure}
+\centerline{\epsfxsize=0.6\textwidth \epsffile{mseq-sr.eps}}
+BLAH.
+\caption{\label{f:mseq1} This shift register circuit generates an M
+sequence based on the polynmial $x^3 + x + 1 = 0$, which can be
+rearranged (modulo $2$) to be $x^3 = 1 + x$.  The m-sequence arises
+from the ``ones'' place of the shift register system, $\ldots 1001011\ldots$.}
+\end{figure}
+
+It is quite fortunate that prime polynomials modulo 2 exist for all
+orders of polynomials.  Thus, unlike Barker codes arbitrarily long
+M-sequences can be found (although not for all lengths).
+
+The underlying polynomials are ``prime'' which means that they have no
+factors except themselves and unity.  Of course, this factorization is
+to be performed with coefficients modulo 2.  Thus, the polynomials $x$
+and $x + 1$ are prime, although $x^2 + 1$ is not since it is the
+square of $x+1$ (modulo 2).  A beginning table of prime polynomials
+can be found in \tabref{ppolys}.  This table is not exhaustive, it's
+just an indication of some primes.  None of the entries are really
+large enough to use; in practice primes of order 10, giving sequences
+of length 1023 begin to be useful.  A prime polynomial of order 48 is
+embedded in the Global Positioning System algorithms; it is evaluated
+each microsecond, and its period is thus (8.9 years).  The Qualcomm
+CDMA protocol uses a generalization of m-sequences called ``Gold
+codes'' \cite{uppala-1998,gold-1967,gold-1968} to permit several users
+to share a single channel.
+
+\begin{table}
+\caption{\label{t:ppolys} A beginning table of prime polynomials
+modulo 2.  The polynomials exist for all orders, and there are many of
+them.  Polynomials of any particular order need only be tested by
+primes of half order or smaller; also, a complete table can be built
+using ``sieve'' methods.  As in the conventional natural primes, there
+is no pattern which permits easy testing or generation of large primes.}
+\centerline{\begin{tabular}{rl}
+order & polynomials \\ \hline
+1     & $x, x+1$ \\
+2     & $x^2 + x + 1$ \\
+3     & $x^3 + x + 1, x^3 + x^2 + 1$ \\
+4     & $x^4 + x + 1, x^4 + x^3 + 1$ \\
+5     & $x^5 + x^2 + 1, x^5 + x^3 + 1, x^5 + x^3 + x^2 + x + 1, \ldots$ \\
+6     & $x^6 + x + 1, x^6 + x^3 + 1, \ldots$
+\end{tabular}}
+\end{table}
+

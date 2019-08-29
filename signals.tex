@@ -1,0 +1,199 @@
+% $Id: signals.tex,v 1.1 2005/01/22 22:53:39 jdsahr Exp $
+
+\newtheorem{definition}{definition}
+\newtheorem{example}{example}
+
+\part{Radar Signals}
+
+\chapter{Estimation and Detection Theory}
+
+\section{Random Processes}
+
+A random process is a signal whose behavior is random as opposed to
+deterministic.  We describe random processes somewhat differently than 
+we describe other signals; although we use some of the same words, the
+meaning may have some technical differences.
+
+Let's begin with a single random process $x(t)$.  Unless otherwise
+stated, our random processes all behave like signals emerging from a
+receiver, they have field units (volts) as opposed to power or energy
+units.
+
+We define the average value of the random process in two technically
+different ways.
+
+\begin{definition}{Time Average}
+An arithmetic average formed numerically from real data, as in
+\begin{equation}
+\bar{x} = \frac{1}{T}\int_T x(t) dt \equiv \frac{1}{N} \sum_N x[n]
+\end{equation}
+\end{definition}
+\begin{definition}{Ensemble Average}
+An ideal average, formed by making a single independent measurement
+an infinite number of times; equivalently the ``first moment'' of the
+probability density function\footnote{assume you know what a pdf is},
+\begin{equation}
+\langle x \rangle = \int x f_x(x)\; dx
+\end{equation}
+\end{definition}
+As a practical matter, all data analysis works by implementing time
+averages, because the ensemble average is never available.  It happens 
+that most statistical theory is more easily formed in terms of the
+ensemble average, however.  Thus it would be extremely convenient if
+the ensemble average and the time average were numerically equivalent.
+This turns out to be the usual case, although the issue is subtle.
+
+\begin{definition}{Ergodicity}
+A random process is said to be ergodic if its time averages are
+equivalent to its ensemble averages.
+\end{definition}
+
+It is possible to imagine stochastic processes whos properties change
+as a function of time, getting more powerful, changing their spectral
+shape, etc. and such variation is straightforward to handle with
+ensemble averages.  However, in the real world we have to work with
+time averages, so if a process is changing its power during the time
+we are collecting measurements, ... well, it's a problem.  Thus we
+have the notion of \textit{stationarity}:
+\begin{definition}{stationarity}
+A stochastic process is said to be stationary if all of its moments
+are constant in time.
+\end{definition}
+\begin{definition}{mutual stationarity}
+Several stochastic processes are said to be jointly stationary if
+their joint moments are constant in time.
+\end{definition}
+
+It is very important to distinguish the concept of ``stationarity''
+from ``constancy.''  A coin toss is a non constant process yielding
+heads or tails; it is completely unpredictable.  On the other hand a
+coin toss is ``stationary'' since the odds of head or tail does not
+change with time ... unless someone does something drastic to the coin 
+(such as bending it).
+
+The property of stationarity is very powerful; in radar we frequently
+need only a relaxed version of stationarity, namely ``wide sense
+stationary''
+\begin{definition}{Wide Sense Stationarity} A process is said to be
+wide sense stationary if its second order moments are constant in
+time.
+\end{definition}
+
+\section{Estimation}
+
+Now we couple basic ideas from statistics with the need to convert
+data into useful estimates.  Again, several definitions are coming.
+
+\begin{definition}{Estimator}
+An estimator is a function of data which produces an estimate of a
+parameter (or perhaps several parameters).  For example, the following 
+is an example of an estimator for the arithmetic mean:
+\begin{displaymath}
+\frac{1}{N}\sum_{n=0}^N x_n
+\end{displaymath}
+\end{definition}
+\begin{definition}{Estimate}
+An estimate is the numerical result of applying an estimator to data,
+thus $\hat{x}$ is an estimate of the arithmetic mean:
+\begin{displaymath}
+\hat{x} = \frac{1}{N}\sum_{n=0}^N x_n
+\end{displaymath}
+An estimate is a random variable, since it is a mathematical
+function of random variables.
+\end{definition}
+
+Note that in summations I use the convention that the lower limit is
+inclusive (typically starting at zero) and the upper limit is
+exclusive (last term is $N-1$, not $N$).
+
+\subsection{properties of estimators}
+
+Estimators may be good or bad, the may give answers which are always
+wrong, but for which the amount of wrongness improves (decreases) with
+more data.
+
+\begin{definition}{Unbiased Estimator}
+An unbiased estimator has the important property that its expected
+value is equal to the parameter being estimated, or mathematically,
+\begin{displaymath}
+\langle \hat{x} \rangle = \langle x \rangle
+\end{displaymath}
+\end{definition}
+
+\begin{example}{The usual estimator of the arithmetic mean is unbiased}
+\begin{displaymath}
+\langle \hat{x} \rangle = 
+\left\langle\frac{1}{N}\sum_{n=0}^N x_n \right\rangle =
+\frac{1}{N}\sum_{n=0}^N \langle x_n \rangle =
+\frac{1}{N}\sum_{n=0}^N \langle x \rangle = 
+\frac{N}{N}\langle x \rangle = \langle x \rangle
+\end{displaymath}
+\end{example}
+
+A weaker but nevertheless useful property is ``consistency.''
+\begin{definition}{Consistent Estimator}
+A biased estimater is said to be consistent if the bias vanishes as
+the amount of data increases without limit.
+\end{definition}
+
+\begin{example}The ``obvious'' estimator of the standard deviation is
+biased but consistent:
+\begin{displaymath}
+\hat{SD}_1^2 = \frac{1}{N} \sum_n^N \left(x_n - \frac{1}{N}\sum_m^N
+x_m\right) \;\;\;\;\;\;\;\;\;
+\left\langle \hat{SD}_1^2 \right\rangle = \left(1-\frac{1}{N}\right) \sigma^2
+\end{displaymath}
+The expected value differs from the ideal result by the
+factor $(1 - 1/N)$.  However, in the limit $N\rightarrow\infty$ the bias
+vanishes.
+\end{example}
+
+
+Additional properties of estimators are expressed in terms of the
+``goodness'' of estimators, which is typically expressed in terms of
+the variance of the estimate:
+\begin{definition}{Estimator Variance}
+The variance of an estimator is defined as the expected value of the
+square of the data less the true mean:
+\begin{displaymath}
+\textrm{Var}\hat{p} = \left\langle \left(\hat{p} - \langle\hat{p} \rangle 
+\right)^2 \right\rangle
+\end{displaymath}
+By expanding the square and using the linearity of the
+$\langle\cdot\rangle$ operator we find equivalently that
+\begin{displaymath}
+\textrm{Var}\hat{p} = \langle\hat{p}^2\rangle - \langle \hat{p} \rangle^2
+\end{displaymath}
+This latter form is usually more convenient for calculations.
+\end{definition}
+
+Thus we can compare the quality of two estimators, noting which
+produces the smaller variance, and leading to the following additional 
+definitions.
+
+\begin{definition}{sufficient estimator}
+An estimator is said to be sufficient if no estimator produces a
+smaller variance.
+\end{definition}
+\begin{definition}{efficient estimator}
+An estimator is said to be efficient if it produces the smallest
+possible variance for that parameter.  Any efficient estimator is
+sufficient, but not all sufficient estimators are efficient.
+\end{definition}
+
+Sufficiency and Efficiency appear to be the same thing, but they are
+different.  Efficiency is defined in terms of the ``theoretical
+limit'' defined by the Cramer-Rao Lower Bound\footnote{see some other
+section, or Whalen's text.}, which is a hard theoretic bound that no
+estimator can surpass.  However, efficient estimators may not exist,
+in which case there will still be many estimators that are ``pretty
+good'' in the sense of being better than most.
+
+\subsection{Advice on manipulation of estimators}
+
+There is rarely any difficulty in evaluating first order estimators
+(the mean) for bias.  There is, however, opportunity for 
+
+
+\section{Example: the standard deviation}
+

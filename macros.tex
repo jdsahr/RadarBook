@@ -1,0 +1,96 @@
+% macros.tex.
+%
+% $Id$
+%
+% These are several LaTeX commands and environment modifications which
+% allow improved typesetting of Cornell University dissertations.
+% 
+% Questions to John Sahr johns@alfven.spp.cornell.edu
+%
+
+\typeout{JDS MACROS}
+
+\newcommand{\citey}[1]{\cite{#1}}
+
+\newcommand{\sn}[2]{{#1} \times 10^{#2}}  % scientific notation a x 10^b
+\newcommand{\cmto}[1]{{\rm cm}^{#1}}      % simple power macro for cm units
+\newcommand{\tens}[1]{\stackrel{\rule{1ex}{0.5mm}}{#1}}
+					  % like \vec{} for tensors
+\newcommand{\nablaperp}{\nabla_{\!\perp}} % a better \nable_\perp
+\newcommand{\pr}{\prime}                  % abbreviation for \prime
+\newcommand{\ppr}{{\prime\prime}}         % abbreviation for \prime\prime
+
+\newcommand{\llangle}{\left\langle}       % big left langle
+\newcommand{\rrangle}{\right\rangle}      % big right rangle
+
+\newcommand{\Ci}{\textrm{Ci}}
+\newcommand{\Si}{\textrm{Si}}
+
+\newcommand{\sinc}{\textrm{sinc}}
+\newcommand{\cosech}{\textrm{cosech}}
+
+\newcommand{\iint}{\int\!\!\!\int}
+\newcommand{\curl}{\nabla\times}
+
+\newcommand{\noop}[1]{}                   % handy for ``commenting out''
+\newtheorem{definition}{definition}       % definition environment
+\newtheorem{example}{example}             % example environment
+
+\newcounter{deffc}
+\newenvironment{deff}[1]{\noindent\stepcounter{deffc}\textit{def \arabic{chapter}.\arabic{deffc}}: \textbf{#1}\rule{0mm}{2em} ---}{\\}
+
+\newlength{\defaultskip}
+\setlength{\defaultskip}{\baselineskip}
+
+% My labelling scheme works as follows:
+%
+%  figure   references all begin with ``f:''
+%  table    references all begin with ``t:''
+%  text     references all begin with ``p:''
+%  equation references all begin with ``e:''
+
+\newcommand{\eqref}[1]{(\ref{e:#1})}          % formatted equation
+					      % reference, i.e. (3.31)
+\newcommand{\figref}[1]{Fig.~\ref{f:#1}}      % formatted figure
+					      % reference, i.e. Fig.~3.31
+\newcommand{\tabref}[1]{Table~\ref{t:#1}}     % formatted table
+					      % reference, i.e. Table~3.31
+\newcommand{\coderef}[1]{Code Ex.~\ref{c:#1}} % formatted code example
+					      % reference, i.e. Code Ex.~3.31
+
+% the following function may be needed for my thesis
+% \newtheorem{definition}{Definition}[chapter] % environment for
+%					      % definitions 
+
+% tcaption{} is the same as caption, except that you get a single
+% spaced caption instead of regular text spacing.  tfigure{}
+% (ttable{}) is the same as figure{} (table{}), forcing the [tb]
+% placement, and  making sure the lof gets made right.  This should
+% be used for both tcaption{} and ttable{} (below).
+
+\newcommand{\tcaption}[1]{\caption{#1\SS}}
+
+\newenvironment{tfigure}{\begin{figure}[tb]}{\addtocontents{lof}{\protect\addvspace{\lotlofextraspace}}\end{figure}} 
+
+% ttable{} the considerations are the same as for tfigure{}.
+
+\newenvironment{ttable}{\begin{table}[tb]}{\addtocontents{lot}{\protect\addvspace{\lotlofextraspace}}\end{table}}
+
+% yacc{} environment with \item[] sets code for yacc somewhat nicely
+
+\newcommand{\yitem}[1]{\item[{{\bf #1} \hfill}]}
+
+\newenvironment{yacc}%
+{\SS\begin{list}{}{\itemsep=1ex \leftmargin=1.25in \labelwidth=1.0in \parsep=0.0pt \labelsep=.13in}}{\end{list}\DS}
+
+% from Kopka and Daly, page 192, for typesetting chemical formulas
+\newlength{\fntxvi} \newlength{\fntxvii}
+\newcommand{\chemical}[1]
+{{\fontencoding{OMS}\fontfamily{cmsy}\selectfont
+  \fntxvi\the\fontdimen16\font
+  \fntxvii\the\fontdimen17\font
+  $\mathrm{#1}$
+  \fontencoding{OMS}\fontfamily{cmsys}\selectfont
+  \fontdimen16\font=\fntxvi \fontdimen17\font=\fntxvii}}
+
+% end of macros.tex

@@ -1,0 +1,109 @@
+\chapter{Computation of the Ambiguity Function}
+\label{s-ambiguity-function}
+
+As pointed out in Chapter 3, the Ambiguity Function describes the resolution in range and Doppler 
+provided by a radar waveform.  Unfortunately this function has a number of different but roughly 
+equivalent forms.
+
+The form used in this report is as follows, for a radar waveform $u(t)$:
+\begin{equation}
+\chi(\tau,\nu)  = \int u(t) u^\ast(t - \tau) e^{2 \pi j \nu t} \; dt
+\end{equation}
+Some authors prefer to take the absolute value of this expression; others take the absolute
+value squared.  We prefer the complex-valued form above for  important but subtle reasons:
+there is important information present in the phase, and the units of $\chi$ are effectively
+field units (e.g. volts).
+
+The importance of the phase was demonstrated by Meyer [2003]\footnote{@article{meyer2004passive,
+  title={Passive coherent scatter radar interferometer implementation, observations, and analysis},
+  author={Meyer, Melissa G and Sahr, John D},
+  journal={Radio science},
+  volume={39},
+  number={3},
+  year={2004},
+  publisher={Wiley Online Library}
+}}, who pointed out how to perform
+multi-antenna interferometry by computing cross-ambiguity $\chi_{nm}$ on two or more antennas to 
+image the angular distribution of scatter of a deep fluctuating targets.
+
+\section{Self-Ambiguity}
+
+In chapter 3 the Ambiguity function and its several properties were developed.  One of them was a 
+symmetry property:
+\begin{equation}
+|\chi_{uu}(\tau, \nu)| = |\chi^\ast_{uu}(-\tau, -\nu)|
+\end{equation}
+With a slightly different (but completely equivalent) definition of the Ambiguity function, the
+previous expression is true \textit{without} the absolute value operation:
+\begin{equation}
+\tilde{\chi}_{uu}(\tau, \nu) = \int u\!\left(t + \frac{\tau}{2}\right) u^\ast \!\left(t - \frac{\tau}{2}\right) e^{2 \pi j \nu t} \; dt \label{e:wigner}
+\end{equation}
+With this definition, the symmetry property is more simply (and powerfiully) stated:
+\begin{equation}
+\tilde{\chi}_{uu}(\tau, \nu) = \tilde{\chi}_{uu}(-\tau, -\nu) 
+\end{equataion}
+This form of the ambiguity function has some very nice properties, but it is not quite so convenient
+for computation.  Fortunately it is very easy to compute from $\chi_{uu}(\tau,\nu)$:
+\begin{equation}
+\tilde{\chi}_{uu}(\tau, \nu) = e^{-\pi j \nu \tau} \chi_{uu}(\tau, \nu)
+\end{equation}
+
+\subsection{Wigner Distribution}
+The definition of $\tilde{\chi}_{uu}(\tau, \nu)$ in \eqref{wigner} is also known as the Wigner 
+Distribution\footnote{see \textt{https://en.wikipedia.org/wiki/Wigner\_distribution\_function}}, which
+arises in some problems in signal analysis and quantum mechanics.  As such it has a number of 
+properties beyond those mentioned in Chapter 3.
+\begin{eqnarray}
+|x(t)|^2 &=& \int \tilde{\chi}_{xx}(\tau, \nu) \; d\nu \\
+|X(\nu)|^2 &=& \int \tilde{\chi}_{xx}(\tau, \nu) \; d\tau \\
+\int \tilde{\chi}_{xx}(\tau/2, \nu) e^{2\pi j \nu \tau} \; d\nu &=& x(t) x^\ast(0)  \\
+\int \tilde{\chi}_{xx}(\tau, \nu/2) e^{2\pi j \nu \tau} \; d\tau &=& X(\nu) X^\ast(0) \\
+x(t) \rightarrow \tilde{\chi}_{xx}(\tau, \nu) &\leftrightarrow& 
+   x(t-\eta) \rightarrow e^{2\pi j \nu \eta} \tilde{\chi}_{xx}(\tau, \nu) \\
+x(t) \rightarrow \tilde{\chi}_{xx}(\tau, \nu) &\leftrightarrow& 
+   x(t) e^{2 \pi j f t} \rightarrow e^{2\pi j f \tau} \tilde{\chi}_{xx}(\tau, \nu) 
+ \end{eqnarray}
+
+\section{Cross-ambiguity}
+
+The cross ambiguity $\chi_{nm}$ is defined as follows, describing a signal that was received on
+antenna $n$, with a reference to the transmitter signal provided on antenna $m$.:
+\begin{equation}
+\chi_{nm}(\tau,\nu)  = \int u_n(t) u_m^\ast(t - \tau) e^{2 \pi j \nu t} \; dt
+\end{equation}
+
+\section{Cross-ambiguity in the presence of zero doppler ground clutter}
+
+Suppose that the field of view contains a variety of scattering sources of strength $\alpha_k$ at 
+group delay $\tau_k$.
+
+Then the detected signal (following application of the matched filter) is the cross-ambiguity:
+
+\begin{eqnarray}
+\chi'_{nm}(\tau,\nu) &=& \sum_k \alpha_k \int u_n(t - \tau_n) u_m^\ast(t - \tau) e^{2 \pi j \nu t} \; dt \\
+&=& \sum_k \alpha_k \chi_{nm}(\tau - \tau_k, \nu)
+\end{eqnarray}
+Equation D.4 is essentially the starting point for the Manastash Ridge Radar (Sahr, Lind 1997), and 
+applies when the target extends over group delays that are much larger than the correlation time
+of the illumination $u_m(t)$.
+
+In the case of close-in ground clutter, inside the correlation time of $u_m(t)$ this formula is not directly 
+useful.
+
+By using Equation D.10 above, we can rewrite D.14 as an interesting theorem:
+
+\begin{equation}
+\chi'_{nm}(\tau,\nu) = \chi_{nm} (\tau,\nu) \sum_k \alpha_k e^{-2\pi j \nu \tau_k}
+\end{equation}
+
+
+Alternatively we could create the ratio
+\begin{equation}
+\frac{\chi'_{nn}(\tau,\nu)}{\chi_{nn} (\tau,\nu)} = \sum_k \alpha_k e^{-2\pi j \nu \tau_k}
+\end{equation}
+The numerator on the left can be directly estimated from data; the denominator can be estimated if the
+the uncorrupted signal $u_n(t)$ can be estimated.  Finally, the right hand side is a computable
+linear combination of the $\alpha_k$ if the $\tau_k$ are known.  However, it can also be viewed as
+a Fourier Transform of the $\alpha_k$ for a set $\tau_k = k\tau_0$.
+
+

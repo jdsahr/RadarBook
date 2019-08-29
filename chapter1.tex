@@ -1,0 +1,363 @@
+\chapter{Introduction}
+
+Radar is  a mature technology whose basic principles are very well 
+understood. However, enormous potential remains, so research in 
+radar technique remains very lively.  The innovators of radar\footnote{In this text we'll 
+elevate "radar" to the status of a common noun from its origin as an acronym, 
+RADAR, "RAdio Detection And Ranging."} technology have always 
+been able to imagine instruments which are impossible to build in that era
+but which have become possible in a subsequently.
+
+By the beginning of the 21st Century several technological advances have changed a number
+of the driving forces in radar design.  In particular, high speed, low
+cost computing has permitted access to signal processing algorithms that
+were effectively impossible only a decade earlier.  The availability
+of the internet, and GPS time/frequency reference has enabled startling
+new opportunities for multistatic radars and indeed an entirely new
+topology of radar network.  Although advances in RF electronics
+have increased performance in various ways (lower noise figure, higher
+dynamic range, ever higher frequencies, semiconductor power amplifiers
+replacing vacuum devices), the performance revolution has not been so
+dramatic as in computation.  Furthermore, the cost of electricity has
+not changed substantially --- so high power transmitters remain
+expensive to acquire and to operate.  However, one of the parameters
+above --- dynamic range --- does affect our ability to make full use
+of modern digital methods. 
+The tension between the possible in principle and the possible in
+practice has created an enormous repertoire of tricks to permit the
+performance of ``impossible'' measurements.  As technology improves,
+these tricks' importance wanes, although the motivation for the tricks
+remain --- and an understanding of the tricks can conceivably enable a
+new generation of radars which could not have been approached at all.
+We will describe how clever design of waveforms and receivers can 
+\begin{itemize}
+\item eliminate significant imperfections of the receivers
+\item permit ``gigaflop'' processing with ``megaflop'' computers
+\item enable fine resolution of targets whose range and velocity
+spectrum cannot be studied by ``conventional'' means.
+\end{itemize}
+
+The myriad uses of radar instruments provide a constant demand for
+more powerful transmitters, more sensitive receivers, greater receiver
+dynamic range, more real-time signal processing capability, more
+stable time and frequency references, and better (lower) component
+cost.  As radar is applied to complex consumer tasks, such as air
+traffic control, even human psychology becomes an issue as we struggle
+to present complex fields of data to humans in a way which is natural
+and comprehensible, permitting the optimal deployment of extremely
+valuable resources.
+
+The basic idea behind radar is simple: we measure the time of flight
+of a radio wave pulse to deduce the distance to an object which
+reflected the radio wave.  This is the origin of the acronym ``RADAR''
+which stands for ``RAdio Detection And Ranging.'' The ubiquity of
+RADAR has brought it wholly into the language as conventional word,
+truly deserving the honor of lower case letters, as if it were of Greek or Latin origin.
+
+Indeed, the idea of radar has become so common that it is used in very
+different contexts.  A social, political, or economic issue becomes
+important, and we hear expressions such as ``the discovery of taxol in
+the bark of the yew has made the preservation of rare species show up
+on the legislative radar screen.''  Or, just as interesting, we may
+also read of entities attempting to avoid recognition, as in ``the
+various industries which produce toxic waste are flying under the 
+radar.''  Somehow the greater civilization has come to understand that 
+``flying low'' has something to do with avoiding detection by radar, an 
+idea which is basically correct, and about which we'll be able to say a 
+few things in a subsequent chapter.
+
+As it happens, not all radars are intended for range detection, and it
+may be difficult to draw the line between ``radar'' and ``non radar''
+instruments.  We will frequently give examples from our own radar,
+which measures the complete range and Doppler spectrum of extended
+targets --- and yet our radar has no transmitter.  Does it qualify as
+a radar?  Judge for yourself.
+
+The history of radar is fascinating.  Contrary to common belief, radar
+was not suddenly discovered in the 1940s in service of World War II, but 
+long before.  It is true that radar was of profound importance in WWII, 
+because the Allies successfully developed and exploited it, while the
+Axis did not\footnote{need a reference for this}.
+
+\section{some applications --- needs fixing}
+
+RADAR\index{RADAR} --- an acronym which means ``Radio Detection and Ranging''
+
+basic idea: emit a pulse, wait for echoes, factor in $c$ to get
+distance.
+
+But radar is broad:
+\begin{itemize}
+\item ``picket fence'' (NAVSPASUR), CW ``burglar alarms,'' "tripwires"
+\item weather radar (deep, volume targets)
+\item bistatic, multistatic, forward scatter geometries
+\item Synthetic Aperture
+\item Planetary radar astronomy
+\item passive radar
+\item aerospace applications (point targets)
+\end{itemize}
+Incredibly broad set of applications, techniques, frequencies, costs,
+complexities ... very difficult to give single set of design equations
+that cover everything.
+
+Need to acquire basic skills
+\begin{itemize}
+\item Analysis --- come to understand what a radar is doing, and why
+\item Synthesis --- extend knowledge to design new systems.
+\end{itemize}
+
+compare to Forward Problems, Inverse Problems.
+
+\section{Radar before World War 2}
+
+It's possible to debate the origins of radar.  One possible origin
+would be with Hertz and Maxwell at the end of the Nineteenth Century, 
+who performed experiments in which a transmitter produced a wave, a 
+receiver detected the wave, and output of the receiver was affected by the presence of a third object.
+
+There are some earlier experiments worthy of mention, associated with
+attempts (mostly unsuccessful) to measure the speed of light\footnote{need 
+references; lantern unveiling, michelson-morley}.  Electromagnetic waves travel 
+stupendously fast in human terms.  However light is almost sluggish in ways 
+which limit high speed electronics.  Modern desktop CPUs can execute several 
+instructions in the time it takes a radio wave to span the container in which the 
+computer resides. However, our scientific forebears did not have access to equipment
+which could easily split the second into billionths.  Even with the best
+portable clocks using some variant of spring and mass, it's clear that
+efforts to time the uncovering of lanterns on mountaintops (i.e. Ben
+Franklin et al.) were doomed to failure.
+
+\subsection{Well Before Maxwell}
+
+These failures were not due to fundamental limitations in the clocks,
+but the short distance over which the measurement was attempted.  If
+you can resolve 1 microsecond, then 1 km is about the minimum size of
+an experiment which can measure the speed of light.  If your time
+resolution is one second, then the experiment should occupy more than
+300,000 km, roughly the distance to the Moon.  If you wish to resolve
+four decimal places with a clock which ticks seconds, the experiment
+must be a thousand times larger, about the distance to the Sun.
+
+Dutch astronomer Ole Roemer (years) was able to perform this experiment
+with breathtaking precision.  With the invention of the telescope,
+astronomers were able to measure the orbital period of the moons of
+Jupiter, and that these orbital periods were very well defined --- in
+other words, they are a very stable clock.  Roemer noticed that the
+time of ``rise'' of these moons depended upon whether Jupiter was near
+or far from Earth.  Since Jupiter's orbit has 5.5 times the diameter
+of Earth, it is sometimes as near as 4.5 $R_e$ and as far as 6.5
+$R_e$, a differential distance of about 300 million km, about a thousand
+seconds of light travel time.  Unfortunately, in Roemer's day the
+distance from the Earth to the Sun was not known\footnote{It is interesting
+to contemplate: how would you measure the distance to the Sun?}, although the ratio
+of Jupiter's to Earth's orbital radius (5.5) was known.  So, Roemer
+was able to express the speed of light (simplifying greatly) as 
+\begin{displaymath}
+c = \frac{2R_e}{1000}
+\end{displaymath}
+The symbol $c$ is derived from ``celeritas'' which is Latin for
+``velocity,'' and which symbol was first used by Newton.
+
+\subsection{Michelson-Morley}
+
+The Michelson-Morley experiment (1880s) was developed to measure
+the speed of light with sufficient precision to formally test a
+hypothesis of the ``ether'' theory of electromagnetic wave
+propagation.  The experiment resembled Roemer's observation except
+that the path and time scales were much shorter.
+
+Michelson and Morley developed a ``coincidence detector'' which in
+which a pulse of light appeared at a detector only when it traversed a
+fixed (known) path and managed to reflect from two rotating mirrors at
+exactly the right moment in their rotation.  By varying the rotation
+speed of the two mirrors, different candidate speeds of light could be
+tested (stating the experiment this way foreshadows the ``matched
+filter and ambiguity function'' topics to come.).  The two mirrors
+were actually different faces of an octagonal cylinder, and indeed
+there are several solutions to the problem, but the least rotational
+speed which yields a stable image unambiguously provides the speed of
+light.  The timescale of the experiment was under a millisecond, and
+the time resolution less than a microsecond, so the experiment fit
+onto an Earthly laboratory (a hundred meters or less).
+
+\subsection{James Clerk Maxwell}
+
+Maxwell was a prolific physicist.  Among his major accomplishments was
+a unification of the electric and magnetic fields through what are now
+known as ``Maxwell's Equations.''  In modern (differential) form, and MKSA units,
+these equations are as follows
+\begin{eqnarray}
+\nabla\times \vec{E} &=& -\frac{\partial \vec{B}}{\partial t} \\
+\nabla\times \vec{H} &=&  \frac{\partial \vec{D}}{\partial t} + \vec{J} \\
+\nabla\cdot \vec{D}  &=& \rho \\
+\nabla\cdot \vec{B}  &=& 0
+\end{eqnarray}
+Maxwell's particular contribution was the addition of the $\partial
+\vec{D}/\partial t$ term.  Again, in modern notation, if we apply the
+constitutive relations
+\begin{eqnarray}
+\vec{D}    &=& \epsilon \vec{E} \\
+\epsilon_0 &=& 8.854...\times 10^{-12} \textrm{F/m} \\
+\vec{B}    &=& \mu \vec{H} \\
+\mu_0      &=& 4\pi \times 10^{-7} \textrm{H/m}
+\end{eqnarray}
+and develop a wave equation for the electric or magnetic fields, we
+find
+\begin{equation}
+\left(\nabla^2 - \mu \epsilon \frac{\partial^2}{\partial t^2}\right) \vec{E}  = 0
+\end{equation}
+Here $\mu \epsilon$ is recognized to have the units of inverse
+velocity (squared) and in free space that velocity is
+\begin{equation}
+c = \sqrt{\frac{1}{\mu_0 \epsilon_0}} \approx 3 \times 10^8 \;
+\textrm{m/s}
+\end{equation}
+There are several important features of this development.
+\begin{itemize}
+\item the vacuum propagation speed $c$ is independent of time and
+length scales --- thus radio waves and light waves become different
+aspects of the same phenomenon, as well as infrared light, x rays, and
+gamma rays.
+\item the wave equation is not dispersive (in vacuum) so that
+well-formed pulses retain their shape as they propagate.  
+\item $\mu$ and $\epsilon$ can in principle be measured in
+electrostatic and magnetostatic experiments (the constitutive
+relations), so the that speed of propagation $c$ can be deduced from
+very different experiments from ordinary ``speed trials.''
+\end{itemize}
+Michelson and Morley and others performed their experiment to address
+troubling questions that arise if two observers with different
+velocities observe the same electromagnetic experiment: when we say
+``the speed of light is $3\times10^8$ m/s,'' what should the person
+who is moving west at 10 m/s say?  The answer turns out to be
+``Special Relativity,'' which means that Maxwell's Equations are
+ultimately far more important than descriptors of electromagnetic
+waves: they forced the development of the theories of Special and
+General Relativity.  From the moment that Maxwell's Equations for
+electromagnetics were offered, twenty five years passed before
+Einstein published his theory of Special Relativity.  In retrospect it
+needn't have taken this long, but theories of relativity require us to
+think rather profoundly about the nature of space-time, as opposed to
+the more immediate view that space and time are largely independent,
+and certainly not related by the motion of observers.
+
+\subsection{Early Studies of the Ionosphere}
+
+Ionosondes --- 1918; Eckersley 1937.
+
+\subsection{early aerospace}
+
+Passive Radar in England
+
+\section{From World War 2 to the Digital Age}
+
+Although radar was not really invented in World War 2, the explosion
+of research and development during and immediately after WW2
+fundamentally colored the perception of the radar problem, its
+nomenclature, and established its importance as a tool in modern
+warfare and national defense.
+
+\subsection{VHF, UHF, EHF, sources and detectors}
+
+\subsection{algorithms: MTI, conical scan, monopulse}
+
+WWII and the Cold War
+
+\subsection{Big Radars}
+
+\subsubsection{BMEWS/DEW Radars}
+
+\subsubsection{Planetary Radar Astronomy}
+
+\subsubsection{Thomson Scatter Radars}
+
+\section{The Early Digital Age}
+
+\subsection{SAR and ISAR}
+
+\subsection{phased arrays}
+
+\section{The Modern Era: since 1985}
+
+\subsection{high speed elecronics}
+
+\subsection{time and frequency reference}
+
+\section{Why Study Radar?}
+
+If you're going to be a radar technician, the answer is obvious.  But
+suppose you are \textbf{not} going to be a radar jock.  Is radar still
+worth looking at?
+
+\subsection{Radar as dual of Communications}
+
+In Communications, you try to send an unknown data signal through a fairly
+well-known channel, in hopes of recovering the data
+
+In Radar, you send a fairly well-known signal through a poorly-known
+channel, in hopes of recovering the structure of the channel.
+
+Note, in some communications systems there is a ``training'' sequence
+in which a known signal is sent through the channel to discover the
+approximate impulse response of the channel.
+
+\subsection{Radar as an Inverse Problem}
+
+If we know the strength of the transmitter, the distance to the target, the size of the target, 
+then we can predict how much signal will be received.  This is a \textit{Forward Problem}, 
+which is an important class of problems to understand.  
+
+However, more interesting would be the following: if we transmit a known signal, and at some
+later time receive an echo of that signal, what can we deduce about the nature of the target that 
+caused the reflection?  This is an \textit{Inverse Problem}.
+
+To cast this differently, on a billiards table, if you know the position of all the balls, and the frictional
+forces that slow them, then upon striking the cue with a known vector impulse, it should be possible
+to deduce the terminal position of all the balls --- a forward problem.
+
+On the other hand, suppose you viewed a configuration of balls, and were asked to determine the initial 
+configuration as well as  the impulse given to the cue
+As presented, this problem is hopeless.   But suppose that one was able to know "how many ball-ball
+collisions were there?" and "what were the instants in which they occurred?"  This problem would still
+be very difficult, but the number of solutions could, conceivably be manageable.
+
+
+\subsection{Radar as driver for Engineering Art}
+
+Radar requires extremes of performance:
+\begin{itemize}
+\item RF systems
+  \begin{itemize}
+  \item low power/weak signals
+  \item high power/transmitters
+  \item very fast switches
+  \item Antennas
+  \item RFI/EMC issues
+  \end{itemize}
+\item Signal Processing
+  \begin{itemize}
+  \item Detection \& Estimation Theory
+  \item Parameter Estimation --- Inverse Problems
+  \item Tracking
+  \item Filtering
+  \item Statistics (lots!)
+  \end{itemize}
+\item Digital Systems/Mixed Signal Systems
+  \begin{itemize}
+  \item Data Acquisition
+  \item Data Transport
+  \item Data Storage
+  \item ASIC design
+  \item EMC/EMP robustness
+  \end{itemize}
+\item Software
+  \begin{itemize}
+  \item (Graphical) User Interface design
+  \item Real Time Systems
+  \item Reliability/Robustness
+  \item Networking
+  \item Documentation
+  \end{itemize}
+\end{itemize}
+
+

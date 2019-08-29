@@ -1,0 +1,422 @@
+\chapter{The Radar Equation}
+
+In designing radars we need a method to predict their performance, to
+answer the question, ``How large an echo signal will a target
+present?'' or conversely, ``How far away might we detect a particular
+target?''  The context of such questions is critical to understanding
+the meaning of the answer.
+
+We will construct the radar equation several times, beginning with
+simple context and adding sophistication as we proceed.
+
+\section{Elementary Monostatic Form}
+
+A radar consists of a transmitter, a transmitting antenna, a receiver,
+and a receiving antenna.  It is often the case that the receiver and
+transmitter share an antenna.
+
+If the transmitter has power $P_T$, and radiates its power through an
+isotropic antenna, then the Poynting Flux (power flux density) is 
+\begin{equation}
+S_{iso} = \frac{P_T}{4\pi R^2} \;\;\; \textrm{W/m}^2
+\end{equation}
+where $R$ is the distance to the target.  If, however, the antenna has
+some gain $G_T$, then in the direction of the beam the Poynting Flux
+is increased by this factor, 
+\begin{equation}
+S = \frac{P_T G_T}{4\pi R^2}
+\end{equation}
+
+This Poynting Flux $S$ is therefore the ``brightness'' of the
+radiation which strikes the target.  The target will interact with the
+radiation, absorbing some fraction and scattering the rest; let us
+assume for the moment that all the radiation is scattered, and that it
+is scattered isotropically.  Therefore, the power radiated from the
+target back to the receiver, over the same distance $R$ is
+\begin{equation} \label{e:rcs1}
+S_{scat} = \frac{P_{target}}{4\pi R^2}
+\end{equation}
+
+Now, how large is $P_{target}$?  It ought to scale with the incident
+power flux density, and it also ought to depend on the size of the
+target.  We make the connection that the target presents an area
+$\sigma$ to the illumination, so that the intercepted power is
+\begin{equation}
+P_{target} = \sigma S
+\end{equation}
+
+Thus, the scattered Poynting Flux now can be expressed
+\begin{equation}
+S_{scat} = \frac{\sigma S}{4\pi R^2} =  \frac{P_T G_T \sigma}{(4\pi)^2 R^4}
+\end{equation}
+
+Finally, the receive antenna collects the scattered signal.  The
+antenna presents an effective area $A_e$ to the scattered Poynting
+Flux.  We may find it more convenient to instead relate the effective
+area to the gain,
+\begin{equation}
+A_e = G \frac{\lambda^2}{4\pi}
+\end{equation}
+When the transmitter and receiver share an antenna, then $G_T = G_R =
+G$.
+
+Putting this all together, we have what is often called ``The Radar
+Equation:''
+\begin{equation} \label{e:radareq0}
+P_R = \frac{P_T G^2 \sigma \lambda^2}{(4\pi)^3 R^4}
+\end{equation}
+
+It is common to express the radar equation in dB; note that $4\pi$ is
+very nearly 11 dB, and that $R$ is in meters (not km, or any other
+unit).
+
+\subsection{Scattering Cross Section}
+
+Previously we defined the scattering cross section $\sigma$ as the
+area which accounts for the fraction of power intercepted by the
+target (see \eqref{rcs1}).  This definition is not bad for starters,
+but it has some major limitations in descriptive power.
+
+For the radar problem, we don't really care how much power the target
+intercepts, what we \textbf{really} care about is how much is
+scattered towards our receiver.
+
+A very nice (and general) definition for the bistatic scattering cross
+section is given by \cite{tsang-kong-shin}:
+
+\begin{equation}
+\sigma(\hat\imath, \hat o) = 4\pi \lim_{r\rightarrow\infty} r^2 
+\frac{\vec{E}_s\cdot\vec{E}_s^\ast}{\vec{E}_i\cdot\vec{E}_i^\ast}
+\end{equation}
+
+
+\subsection{Noise}
+
+The received power $P_r$ in \eqref{radareq0} tells us how large the
+scattered signal is, but it does not tell us whether that signal is
+detectable.  Many signals compete for the attention of a radar,
+including noise, clutter (echoes from targets we do not want to see),
+interference (signals from other sources which accidentally interfere
+with our receiver), and jamming (signals which others present to
+interfere with our radar).
+
+Let us consider noise first.  Noise is an unavoidable aspect of all
+physical systems, which arises from finite temperature effects.  
+Targets are embedded in a setting which has a finite temperature, and
+thus the background radiates noise power into the antennas.  In
+addition, the circuitry which manipulates the signals is itself at
+finite temperature, and thus contributes noise power to the total
+signal.
+
+Noise must also be specified in its temporal and spectral content.  It
+can be impulsive (``shot noise'') or constant; it can be gaussian or
+non gaussian (in amplitude statistics); it can be ``white'' (a flat
+power spectrum) or ``colored'' (a non-constant power spectrum).
+
+For our immediate purposes we'll assume that the noise is constant,
+gaussian, and white.  In this case the noise can be described with a
+simple power spectral density,
+\begin{equation}
+\frac{dP_N(f)}{df} = k_B T_{sys} \;\;\;\; \textrm{W/Hz}
+\end{equation}
+where $k_B = 1.38\times 10^{-23}$ W$/^\circ$K/Hz, and $T_{sys}$ is the
+effective temperature of the receiving system
+
+Thus the total noise power accompanying the signal in a receiver with
+bandwidth $B$ (Hz) is
+\begin{equation}
+P_N = k_B T_{sys} B
+\end{equation}
+
+We can now modify the radar equation to create a version which
+describes the detectability of a scatterer by comparing the scattered
+power to the noise power.
+
+\begin{equation}
+\textrm{SNR} = \frac{P_R}{P_N} = \frac{P_T G^2 \sigma
+\lambda^2}{(4\pi)^3 k_B T_{sys} B}
+\end{equation}
+
+Roughly speaking, a target is just detectable when the SNR = 1,
+although we will need to refine this statement considerably for it to
+be of use.  In aerospace applications an SNR > 15 dB is often
+required, whereas for some other applications an SNR considerably
+smaller than unity will suffice.
+
+By reducing the bandwidth or the system temperature we can increase
+the sensitivity. Special techniques are required to reduce the system
+temperature below about 500 $^\circ K$.  However, some targets exist
+in a very noisy environment so that the system performances is
+dominated by external noise.  Targets and transmitter waveforms often
+create strong lower bounds on practical bandwidth, so that the
+bandwidth cannot be arbitrarily lowered without banishing the desired
+signal.
+
+\subsection{Clutter}
+
+Clutter is a kind of noise-like signal which interferes with
+detection, but is due to the receipt of unwanted transmitter echoes
+from uninteresting targets.  The word ``clutter'' is used in two
+slightly different senses.  In the aerospace community, ``clutter''
+refers specifically to echoes from other specific targets, such as
+trees, buildings, birds, rain, which ionospheric scientists would call
+``ground clutter.''  In the ionospheric community ``clutter'' or
+``range clutter'' refers to confusing signals at a particular range
+which are due to scatterers at a different range --- in the aerospace
+community this would be known as ``ambiguity.''  At any rate, clutter
+is any noiselike signal which goes away if you turn the transmitter
+off.  
+
+We could assign a scattering cross section $\sigma_c$ to clutter
+sources (as well as a specific range).  Since both the scattered
+signal and the clutter power depends upon the transmitter power, the
+Signal to Clutter Ration (SCR) is independent of the transmitter
+power.  To put it differently, you cannot overcome clutter by
+increasing the transmitter power.
+
+Ground clutter is associated with targets that are not moving, or at
+least not moving very fast.  Such clutter can often be substantially
+removed with appropriate Doppler processing, with a particularly
+simple example being ``moving target indicator'' or MTI radar.
+
+Ground clutter is typically ``near'' the transmitter.  In ionospheric
+radars most of the ground clutter is gone after about 80 km, at which
+point a ``pure'' signal remains.  However we must recal that the delay
+between a target at 75 km and at 90 km is only 100 $\mu s$; if the 75
+km ground clutter is large, the receiver must recover recover its
+sensitivity in time to ``see'' the weaker, desirable target.
+
+Finally, one can sometimes address ground clutter problems by careful
+design of antenna patterns so that the ground clutter is not
+illuminated in the first place.  Such techniques are usually
+restricted to short wavelengths.
+
+\subsection{Jamming and Interference}
+
+It may be that some other party intentionally or accidently radiates a
+signal which desensitizes the radar.  There are a variety of
+techniques to address this:
+\begin{enumerate}
+\item locate the interferor and reduce its emissions. 
+\item increase the transmitter power.  advantage: simple and
+effective.  disadvantage: consumes more power, radiates larger signal.
+\item adaptive beam forming to locate and null the interference.
+advantage: sophisticated response, provides location of interferor
+disadvantage: requires more complex antenna and receiver, much more
+computation, creates ``blind spots'' where you can never see.
+\item move to a new location which does not suffer interference.
+advantage: effective; disadvantage: lose original field of view
+\end{enumerate}
+In military applications ``jamming'' is also known as ``electronic
+counter measures'' or ECM, while counter measures to jamming are
+called ``electronic counter counter measures'' or ECCM.  There is an
+enormous literature on these topics, and whole engineering journals
+devoted to the subject.
+
+
+
+\section{Bistatic Radar Equation}
+
+In the previous development we assumed that the transmitter and
+receiver shared an antenna at a single site.  This is not necessary,
+although it is often the most convenient and efficient arrangment.
+However, in the late twentieth century a number of technological
+advances have reduced some of the challenges to operating transmitters
+separately from receivers.  These ``bistatic'' radars have some
+interesting operational features which should increase their
+prevalence.
+\begin{itemize}
+\item bistatic radar transmitters can use very high duty cycle
+waveforms, which permit efficient, low peak power transmitters.
+\item no T/R switch is needed.
+\item receivers may be forward located with low visual impact
+\item a target may be viewed from several angles, increasing the
+quality of information gathered.
+\item receivers may be able to operate ``passively,'' taking advantage
+of ``transmitters of opportunity.''
+\end{itemize}
+
+For an scatterer in a bistatic system there are now two distances in
+the formula: $R_T$ is the distance from the target to the transmitter;
+$R_R$ is the distance from the target to the receiver, so that the
+bistatic radar equation becomes
+\begin{equation}
+P_R = \frac{P_T G_T G_R \, \sigma \lambda^2}{(4\pi)^3 R_T^2 R_R^2}
+\end{equation}
+In the equation above no structure is shown in the scattering cross
+section, but in we need to account for the generally complex structure
+of the cross section,
+\begin{equation}
+\sigma = \sigma(\lambda, \hat{\imath}, \hat{o})
+\end{equation}
+Here $\lambda$ represents the frequency dependence of the target
+scattering, $\hat{\imath}$ is a unit vector pointing in the direction
+of the illuminating wave, and $\hat{o}$ is a unit vector pointing in
+the direction of the scattered wave.  This expression is necessarily
+limited to the far field.
+
+In fact, the expression for $\sigma$ should be further expanded to
+account for the relative scatter of the two polarization states that
+the waves may have (thus $\sigma$ is a tensor of rank $2\times 2$).
+If the target has high enough velocity, then relativistic corrections
+would complicate the expression further.  We'll have a bit more to say
+about scattering cross section: it is a large topic.
+
+% \hline
+
+\section{The Radar Equation (2)}
+
+Mathematical formulas which describe the strength or detectability of
+targets as a function of range, transmitter power, antenna gains,
+etc., are known as ``the radar equation.''  In order to complete these
+expressions we'll have to introduce the concept of ``radar scattering
+cross section'' (RCS).  We will not comment extensively on the RCS, an
+enormous topic.
+
+To start we will consider the case of a simple point target which lies
+at a suitably large distance so that the radar waveform may be treated
+as a plane wave, and also that the angular size of the target be much
+smaller than the antenna beam (these assumptions may all be relaxed.).
+
+Consider a transmitter which produces $P_t$ power, and delivers this
+power to an isotropic antenna.  The power density (Poynting Flux)
+found at a distance $R$ from the antenna is thus
+\begin{displaymath}
+S_t = \frac{P_t}{4\pi R^2}
+\end{displaymath}
+
+If the antenna has gain $G_t$, then in the direction of that gain the
+power density is
+\begin{equation}
+S_t = \frac{P_t G_t}{4\pi R^2}
+\end{equation}
+
+A point-like target intercepts a fraction of the incident power
+$\sigma S_t$ and re-radiates it (assume isotropic scatter for the moment).
+Then the power density returned to the transmitter over the same
+distance $R$ is
+\begin{equation}
+S_r = \frac{\sigma S_t}{4 \pi R^2} = \frac{\sigma G_t P_t}{(4\pi)^2R^4}
+\end{equation}
+Therefore the received power $P_r$ is simply the scattered power
+density $S_r$ times the effective area of the receiving antenna $A_r$:
+\begin{equation}
+P_r = \frac{\sigma A_r G_t P_t}{(4\pi)^2R^4}
+\end{equation}
+There is a simple relation between the effective area of an antenna
+and its gain,
+\begin{equation}
+A = \frac{G \lambda^2}{4\pi}
+\end{equation}
+where $\lambda$ is the wavelength of the radiation.  Thus the
+expression for the received power may be written in terms of the
+antenna gains or areas
+\begin{equation}
+P_r = \frac{\sigma G_r G_t \lambda^2 P_t}{(4\pi)^3 R^4}
+    = \frac{\sigma A_r A_t P_t}{4\pi  \lambda^2 R^4}
+\end{equation}
+For many radars, the transmitter and receiver share a single antenna,
+in which case the transmitting and receiving gains (or areas) are
+identical.
+
+Considering the equations above it is plain that the fraction of
+intercepted power $\sigma$ has units of area.  The parameter $\sigma$
+is known as the radar cross section, and in the usage above it has the
+additional implication of being the ``backscatter cross section.''
+
+\subsection{features of the radar equation}
+
+The simplicity of the radar equation makes it very easy to analyze,
+and there are important implications for radar systems in even this
+most basic form.
+
+\begin{itemize}
+\item \textbf{Inverse fourth power range dependence.}  As a target of
+constant size $\sigma$ changes range, the scattered power varies
+rapidly.  A target just detectable (SNR $\approx$ 0 dB) at range $R$ is
+easily detectable at range $R/2$ (SNR $\approx$ 12 dB), while being
+undetectable at range $2R$ (SNR $\approx -12$ dB).
+\item \textbf{Doubly effective antenna.}  For a monostatic radar in
+which the same antenna is used for transmission and reception, the
+gain appears \textit{twice}, thus a 20 dB antenna contributes 40 dB to
+the overall signal strength.
+\item \textbf{High dynamic range of required of receivers.}  A target
+tracked from 10 km to 100 km has a signal strength change of 10,000.
+When coupled with ``clutter'' from targets which are not interesting
+but otherwise large (nearby trees, buildings, mountains, etc.), or
+electronic countermeasures (ECM) such as jamming, receivers with
+dynamic range of 100 dB are desirable.  Receivers with instantaneous
+dynamic range of 140 dB exist.
+\item \textbf{short wavelengths desirable.}  Assuming that engineering
+considerations limit the physical size ($A$) of antennas, the signal
+strength increases for shorter wavelengths (when the antenna area is
+held constant).
+\item \textbf{high power transmitters are desirable.}  The scattered
+power is clearly proportional to the transmitter power.  At suitably
+high power, the transmitted signal may actually modify the target ---
+induced heating, for example.
+\end{itemize}
+
+It's important to realize that all of the items above can be followed,
+by ``yes, but ...'' arguments.  For example, the argument about
+preferring short wavelengths fails if the target scattering cross
+section $\sigma \propto \lambda^{-k}$ for $k > 2$.  Other engineering
+considerations have yet to be considered, such as signal-to-noise
+ratio and receiver bandwidth.  In the case of ``Thomson scatter''
+radar studies of the ionosphere, the Doppler spectrum of the scattered
+signal contains useful information only if the radio wavelength is
+considerably larger than the ``Debye Length'' (a centimeter or so)
+\cite{nicholson-1983}.  The wide dynamic range required of
+(especially) military radars inspires the design of receivers with
+features that are vastly different from ``high quality'' radio
+receivers.
+
+The lesson is that it is important to consider the whole radar
+\textit{system} to evaluate the performance.  Radar systems frequently
+present very unusual constraints which may be very cleverly addressed
+if one's engineering judgment is not clouded by conventional
+electronic systems.
+
+\subsection{Signal to Noise Ratio}
+
+Expressions for the scattered power do not really indicate the
+usefulness of the information presented to radars, especially for
+``weak'' signals.  In the absence of something to compare to, the
+concept of ``weak'' is not defined.  In the real world, noise provides
+a background of confusing signals.
+
+The spectral density of blackbody radiation depends upon the
+temperature and the waelength, as described by the Planck Radiation
+Law:
+\begin{equation}
+N(\lambda)\,d\lambda = \frac{2h\nu^3}{c^2}\frac{1}{\exp(h\nu/k_B T) -
+1}\, d\lambda
+\end{equation}
+where $h = 6.63\times 10^{-34}$ J/Hz (Planck's Constant) and $k_B =
+1.38\times 10^{-23}$ J (Boltzmann's Constant), $T$ is the temperature
+in $^\circ$K, and $\nu$ is the frequency in Hz.
+
+At frequencies $\nu \ll k_B T/h$, the power spectral density is
+essentially constant.  For $T = 300 ^\circ$K, $k_B T/h = 6.24\times
+10^{12}$ Hz, which is in the infrared region.  In this low frequency
+limit, we have
+\begin{equation}
+N(\nu) \, d\nu = k_B T \, d\nu
+\end{equation}
+The quantity $k_B T$ is abbreviated $N_0$, the ``one sided noise
+spectral density'', and at $T = $ 300 $^\circ$K $N_0 = 4.14\times
+10^{-21}$ W/Hz.
+
+The noise power entering an ideal receiver with bandwidth $B$ exposed
+to an environment at temperature $T$ is $N_0 = k_B T B$.  Suppose a
+transmitter emits a pulse of length $t_p$, which means that the echo
+from a point target will also have length $t_p$.  The amount of energy
+scattered into the receiver during this time is simply $P_r t_p$, and
+the amount of noise entering the receiver during this time is just
+$N_0 t_p$.  Dividing the signal energy by the noise energy, we arrive
+at the expression for the SNR of a single pulse:
+\begin{equation}
+\textrm{SNR}_1 = \frac{P_r t_p}{N_0 t_p} =
+	\frac{P_t G_t G_r \lambda^2 \sigma}{(4\pi)^3 R^4 N_0 f_b}
+\end{equation}
+Since 

@@ -1,0 +1,151 @@
+\chapter{Mathematical Reference}
+
+\section{Texts}
+
+Abramovitz and Stegun
+
+Gradshteyn and Ryzhik
+
+Morse and Feschback
+
+Arfken
+
+\section{Fourier Transform}
+
+\subsection{a rambling discussion}
+
+There are many definitions of the Fourier Transform.  While these definitions are mutually consistent, 
+their variety may be disheartening.  In the definitions for Fourier Transforms of continuous 
+functions there are features to be aware of.  
+
+\begin{itemize}
+\item does the reconstruction model depend upon $e^{j\omega p}$ or $e^{-j\omega p}$.
+\item does the expression of frequency depend upon ``natural'' frequency (radians per unit) or 
+cyclic frequency (cycles per unit).
+\end{itemize}
+
+In electrical engineering practice it is usually the case that sinusoidal excitation is expressed with the
+dependence $e^{j\omega t} = e^{2\pi j f t}$, with $j$ itself understood to represent the imaginary unit in 
+the positive imaginary half plane.
+
+Ultimately this means that plane waves, to the Electrical Engineer, would be described as follows:
+\begin{displaymath}
+E(\vec{r},t) = E_0 e^{j(\omega t - \vec{k}\cdot\vec{r})}
+\end{displaymath}
+When studying such waves with Fourier Transform techniques, the underlying constructive basis 
+has a ``$+$'' in front of the temporal component, and a ``$-$'' sign in front of the spatial component.  
+For example, consider the following wave:
+\begin{displaymath}
+E(x,t) = e^{2\pi j(4t - 6x)}
+\end{displaymath}
+If the temporal variation was suppressed, one would be left with 
+\begin{displaymath}
+E(x,t) = e^{2\pi j(- 6x)}
+\end{displaymath}
+in which case it is ambiguous whether the wave is travelling in the $+x$ or $-x$ direction unless you
+were certain of the Electrical Engineering convention.
+
+On the other hand, one might prefer to describe waves with a ``$+$'' sign in front of the spatial 
+component in order to make it slightly more obvious which direction the wave is propagating.  About
+half of the Physics literature uses this convention, which is the opposite of the Electrical Engineering
+convention.
+
+Finally, it is worth mentioning that Ishimaru's electromagnetics textbook CITE CITE CITE uses 
+the Electrical Engineering convention for the first 2/3, and the opposite convention for the final 1/3.
+This was a reasonable choice by Ishimaru, but it serves as a warning that one must keep one's 
+wits handy.
+
+\vspace{1em}
+The second issue has to do with the use of ``natural'' ($\omega$) vs ``cyclic'' frequency ($f$).  
+Fortunately this issue is a little less foggy; it primarily has to do with the presence or absence of
+factors of $2\pi$ in the transformation.  Here, the preference we express is pragmatic: the use of 
+``cyclic frequency'' leads to simpler expressions, easier to remember, and easier to apply.
+
+\label{fourier-transform}
+
+\begin{eqnarray}
+g(t)         &\leftrightarrow& G(f) \\
+g(t)         &=& \infint G(f) e^{2\pi j f t} \; df \\
+G(f)         &=& \infint g(t) e^{-2\pi j f t} \; dt 
+\end{eqnarray}
+
+Note that these transforms have no constants in front of the integrals.  It makes sense if you look 
+at the symmetry of $f$ and $t$: if there was a constant, it should be the \textit{same} constant.
+
+If you put the latter two equations together, you can deduce the following very useful theorem:
+\begin{equation}
+\delta(t) = \int_{-\infty}^\infty e^{2\pi j f t} \;df
+\end{equation}
+This is a pretty strong statement that ``cyclic frequency'' is a very good choice.
+
+Some additional theorems:
+\begin{eqnarray}
+g(t - t_0)   &\leftrightarrow& e^{-2\pi j ft_0} G(f)  \\
+e^{-2\pi f_0 t} g(t) &\leftrightarrow& G(f + f_0) \\
+g(t) \;\textrm{is real} &\leftrightarrow& G(f) \;\textrm{has Hermite-symmetry} \\
+S(f) \;\textrm{is real} &\leftrightarrow& R(\tau) \;\textrm{has Hermite-symmetry}
+\end{eqnarray}
+
+\section{Physical Processes}
+
+The power spectrum of every physical process must be non-negative definite because
+\begin{itemize}
+\item It doesn't make sense to have a negative energy density for any frequency
+\item ... and it certainly doesn't make sense to have a complex-valued energy density.
+\end{itemize}
+
+Skipping a lot of (important, but slightly tedious) math, the power spectrum $S_{xx}(f)$ can be defined as follows:
+\begin{equation}
+S_{xx}(f) = E (|X(f)|^2) = E (X(f)X^\ast(f))
+\end{equation}
+Here $X(f)$ is the Fourier Transform of a physical process $x(t)$.  Since $x(t)$ is real, it is necessarily the case
+that $X(f)$ has Hermite symmetry, $X(f) = X^\ast(-f)$.
+
+This means in turn that the Power spectrum must not only be real but even:
+\begin{equation}
+S_{xx}(f) = E (|X(f)|^2) = E (X(f)X^\ast(f)) = E (X(f)X(-f)) = S_{xx}(-f)
+\end{equation}
+
+And this in turn means that the Autocorrelation function $R(\tau)$ must have Hermite symmetry.
+
+\chapter{Special Functions}
+
+\section{Bessel Functions}
+
+An engineering scientist's introduction to the Bessel Functions usually arises from the study of the wave 
+equation in circular geometry, in which the two dimensional cartesian Laplacian is expressed in 
+cylindrical coordinates:
+\begin{equation}
+\frac{\partial^2 f}{\partial r^2} + \frac{1}{r}\frac{\partial f}{\partial r} + \frac{1}{r^2}\frac{\partial^2 f}{\partial \phi^2} + \omega^2 \mu \epsilon \,f = 0
+\end{equation}
+In radar, the Bessel functions show up in quite different contexts, and most commonly as the 
+\textit{modified} Bessel functions, associated with probabilities.
+\section{The Rician density}
+\begin{equation} f(x\mid \nu ,\sigma )={\frac  {x}{\sigma ^{2}}}\exp \left({\frac  {-(x^{2}+\nu ^{2})}{2\sigma ^{2}}}\right)I_{0}\left({\frac  {x\nu }{\sigma ^{2}}}\right)
+\end{equation}
+This is the pdf associated with observing a voltage of magnitude $x$ in the presence of gaussian noise 
+with variance $\sigma^2$ and a sine wave of amplitude $\nu$.  This collapses to the usual Rayleigh 
+distribution when the amplitude of the sine wave goes to zero,
+\begin{equation} f(x\mid \nu\rightarrow 0,\sigma )={\frac  {x}{\sigma ^{2}}}\exp \left({-\frac {x^{2}}{2\sigma ^{2}}}\right)
+\end{equation}
+
+\section{The K distribution}
+
+NEEDS MORE WORK.
+
+The K-distribution arises in contemplation of the pdf of the product of two (complex) gaussian random 
+variables.  The joint density of the magnitude of two complex gaussian RVs is given as follows:
+\begin{eqnarray}
+f(r, s \mid \sigma ) &=& \exp\left(-\frac{r^2}{2\sigma^2}\right)\exp\left(-\frac{s^2}{2\sigma^2}\right)\,rs\,drds \\
+f(R,S \mid \sigma )&=&
+\end{eqnarray}
+
+If we let $R = rs$, then we can figure out the cumulative distribution of R as follows:
+\begin{eqnarray}
+F( R) &=& \nt_0^R f(R) dR \\
+         &=& \int_0^\infty \int 0^s 
+\end{eqnarray}
+
+
+
+

@@ -1,0 +1,486 @@
+% $Id: chapter2.tex,v 1.2 2005/01/23 01:06:44 jdsahr Exp $
+
+\chapter{Some Radar Basics}
+
+\section{Range Estimation (first pass)}
+
+The basic idea of radar: emit pulse at $t=0$, hear an echo at $t=T$. 	
+
+Q: what is the distance to the target?
+
+A: $T$ is the round trip time, and $cT$ is the total distance traveled
+by the wave, out plus back.  thus
+
+\begin{equation}
+2R = cT \;\;\;\; \rightarrow \;\;\;\; R = \frac{c}{2}T
+\end{equation}
+
+The quantity $c/2$ appears frequently; it is half the speed of light,
+or, colloquially, ``the speed of radar'':
+\begin{eqnarray}
+\frac{c}{2} &=& 1.5\times 10^8 \; \frac{\textrm{m}}{\textrm{s}} \\
+            &=& 150 \; \frac{\textrm{m}}{\mu\textrm{s}} \\
+            &=& 150 \; \frac{\textrm{km}}{\textrm{ms}}
+\end{eqnarray}
+
+\begin{example}
+A police radar ``zaps'' a car 150 m away.  How long before
+the echo returns?
+
+\answer{$T = R/(c/2) = 1\;\mu s$}
+\end{example}
+
+\begin{example}
+Radars studying the Moon receive echoes after about 2.5 seconds.  So,
+how far away is the Moon?
+
+\answer{$R = 1.5\times 10^8 \; \times \; 2.5 = 3.75\times 10^8 =
+  375,000 \; \textrm{km}$}
+
+\end{example}
+
+\section{Doppler Shift (intro)}
+
+Consider a transmitter located at $x_0=0$ which radiates a signal
+$\exp(j\omega t)$,  The field in space is $\exp(j(\omega t - k x))$.
+
+Now, a target at $x=L$ scatters some energy back to the transmitter,
+\begin{eqnarray}
+\textrm{signal at L} &=& \exp(j(\omega t - kL)) \\
+\textrm{signal scattered back is} &=& \exp(j(\omega t - k [2L])) \\
+ &=& \exp(j(\omega t - 2kL)) 
+\end{eqnarray}
+
+So, now suppose that the target is moving, so that $L \rightarrow L +
+vt$.  Then 
+\begin{eqnarray}
+\textrm{the recieved signal is} &=& \exp(j(\omega t - 2k(L + vt))) \\
+&=& \exp(j(\omega t - 2kVt - 2kL) \\
+&=& \exp(j(\omega - 2kV)t - 2kL) \\
+&=& \exp(j(\omega + \Delta \omega) t - 2kL) \\
+\Delta \omega &=& -2kV = -2\left(\frac{2\pi}{\lambda}\right) V\\
+\Delta f &=& -\frac{2V}{\lambda}
+\end{eqnarray}
+
+Thus, the Doppler shift is \textit{negative} for targets with
+increasing distance (``opening targets'') and \textit{positive} for
+targets with decreasing distance (``closing targets'').  
+
+Note also that the velocity $V$ is better described as the ``range rate'' because it represents
+the rate of change of the separation of the target and the radar; it is not the actual target velocity.  
+More generally we have
+\begin{equation}
+\Delta f = -2 \frac{\hat{r}\cdot \vec{V}}{\lambda}
+\end{equation}
+where $\hat{r}$ is a unit vector pointing toward the target from the radar, and $\vec{V}$ is the full vector velocity of the target.
+
+\begin{example} A 10 GHz radar observes an approaching speeding car
+  travelling at 30 m/s.  What is the Doppler Shift?
+
+\answer{The wavelength of 10 GHz is 3.33 cm = 0.0333 m, so the Doppler
+  Shift $\Delta f$ = -2 (-30 m/s)/(0.0333) = 1.8 kHz.}
+\end{example}
+
+\begin{example} A 3 GHz radar looking due East detects an aircraft flying due North.  What is the Doppler shift? \\
+\answer{Zero.  This is because $\hat{r}$ is perpendicular to the target velocity vector.}
+\end{example}
+
+\begin{example} The Jicamarca Radar Observatory (50 MHz) sees meteor
+  ``head echoes'' travelling 50 km/s.  What is the Doppler Shift?
+
+\answer{The wavelength at 50 MHz is 6 m.  Thus, the Doppler Shift is
+  2(50,000)/6 = 16.7 kHz.}
+\end{example}
+
+The latter example indicates that the receiver had better have sufficient bandwidth at 17 kHz above the transmitter frequency in order to capture this signal.  Meteors, at speeds approaching 100 km/s, are probably the highest velocity high mass objects that will ever be studied with radar.
+
+Note that the Doppler Shift increases with increasing radar frequency, 
+and that, as presented, the formulas are not correct with respect to
+Relativity.  On the other hand, consider that Jicamarca/meteor
+example.  The Doppler shift was 17 kHz compared to a transmitter
+frequency of 50 MHz --- a ratio of 1:3000.  This is because the speed 
+of light is \textit{very fast} compared to the speed of even the
+fastest objects with appreciable mass (i.e. meteors).
+When one accounts for relativistic effects we have  \cite{peebles-1998,levanon+mozesan-2004}:
+\begin{equation}
+f_R = f_T \frac{1 - \hat{r}\cdot \vec{\beta}}{1 + \hat{r}\cdot \vec{\beta}}
+\end{equation}
+Here $\vec{\beta} = \vec{v}/c$.  In the limit that $v/c \ll 1$, $\Delta f$ reduces to the non relativistic case.  Referring to the meteor example above, $\beta \le \frac{1}{3000}$ for any possible target that we are ever likely to observe.
+
+\section{The Radar Equation}
+
+The so-called ``Radar Equation''\index{radar equation} is a large set
+of equations which 
+predict the power which is expected to wind up in the receiver after
+transmission and scattering.  There are many variations, and no one
+true radar equation.  We'll build up a common form that uses the
+following assumptions:
+\begin{itemize}
+\item free space propagation
+\item a small target (much smaller than the antenna pattern), which
+  scatters all the power it receives isotropically, absorbing none of
+  the power.
+\item bistatic geometry; distance from transmitter to target is $R_T$,
+  and distance from target to receiver is $R_R$
+\item Transmitter peak power $P_T$
+\end{itemize}
+
+\begin{enumerate}
+\item the Transmitter illuminates the target, producing a Poynting
+  Flux on the target of 
+\begin{displaymath}
+S_T = \frac{P_T G_T}{4\pi R_T^2} \;\;\; \textrm{W/m}^2
+\end{displaymath}
+\item the Target has a scattering cross section of $\sigma$ m$^2$, and
+  thus intercepts an amount of power
+\begin{displaymath}
+P_{target} = \sigma S_T = \frac{P_T G_T \sigma}{4\pi R_T^2} \;\;\;
+\textrm{W}
+\end{displaymath}
+\item The target now reradiates its received power.  In general the power is not scattered uniformly (isotropically), however we will assume isotropic scattering for them moment.  This produces a scattered Poynting Flux at the receiver,
+\begin{displaymath}
+S_R = \frac{P_{target}}{4\pi R_R^2} = \frac{P_T G_T \sigma}{(4\pi)^2
+  R_T^2 R_R^2} \;\;\; \textrm{W/m}^2
+\end{displaymath}
+\item The receiving antenna has an effective area $A_R$, and thus it
+  intercepts a fraction of the scattered power,
+\begin{displaymath}
+P_R = S_R A_R =  \frac{P_T G_T A_R \sigma}{(4\pi)^2 R_T^2 R_R^2}
+\;\;\; \textrm{W}
+\end{displaymath}
+\end{enumerate}
+
+There is a relationship between the effective area of an antenna, and
+the gain of an antenna, namely $G = 4\pi A/\lambda^2$, so this permits
+us to write ``bistatic, point target'' form of the radar equation
+\begin{equation}
+P_R = \frac{P_T G_T G_R \lambda^2 \sigma}{(4\pi)^3 R_T^2 R_R^2}
+\end{equation}
+
+For many radar systems the antenna and the receiver are in the same
+place ($R_R = R_T = R$) and share an antenna ($G_T = G_R = G$) which
+leads to the simpler ``monostatic, point target'' form of the radar
+equation,
+\begin{equation}
+P_R = \frac{P_T G^2 \sigma \lambda^2}{(4\pi)^3 R^4}
+\end{equation}
+
+\subsection{features of the radar equation}
+
+The simplicity of the radar equation makes it very easy to analyze,
+and there are important implications for radar systems in even this
+most basic form.
+
+\begin{itemize}
+\item \textbf{Inverse fourth power range dependence.}  As a target of
+constant size $\sigma$ changes range, the scattered power varies
+rapidly.  A target just detectable (SNR $\approx$ 0 dB) at range $R$ is
+easily detectable at range $R/2$ (SNR $\approx$ 12 dB), while being
+undetectable at range $2R$ (SNR $\approx -12$ dB).
+\item \textbf{Doubly effective antenna.}  For a monostatic radar in
+which the same antenna is used for transmission and reception, the
+gain appears \textit{twice}, thus a 20 dB antenna contributes 40 dB to
+the overall signal strength.
+\item \textbf{High dynamic range of required of receivers.}  A target
+tracked from 10 km to 100 km has a signal strength change of 10,000.
+When coupled with ``clutter'' from targets which are not interesting
+but otherwise large (nearby trees, buildings, mountains, etc.), or
+electronic countermeasures (ECM) such as jamming, receivers with
+dynamic range exceeding 100 dB are desirable. 
+\item \textbf{short wavelengths desirable.}  Assuming that engineering
+considerations limit the physical size ($A$) of antennas, the signal
+strength increases for shorter wavelengths (when the antenna area is
+held constant).
+\item \textbf{high power transmitters are desirable.}  The scattered
+power is clearly proportional to the transmitter power.  At suitably
+high power, the transmitted signal may actually modify the target ---
+induced heating, for example.
+\end{itemize}
+
+It's important to realize that all of the items above can be followed,
+by ``yes, but ...'' arguments.  For example, the argument about
+preferring short wavelengths fails if the target scattering cross
+section $\sigma \propto \lambda^{-n}$ for $n > 2$.  Other engineering
+considerations have yet to be considered, such as signal-to-noise
+ratio and receiver bandwidth.  In the case of ``Thomson scatter''
+radar studies of the ionosphere, the Doppler spectrum of the scattered
+signal contains useful information only if the radio wavelength is
+considerably larger than the ``Debye Length'' (a centimeter or so)
+\cite{nicholson-1983}.  The hostile environment 
+encountered by military radars inspires the design of receivers with
+features that are very different from ``high quality'' radio receivers.  For example
+a poor noise figure may be acceptable if it produces a receiver that is less
+likely to suffer overload.  Indeed, if the environment is very noisy, there is 
+no point in building a low noise receiver.
+
+The lesson is that it is important to consider the whole radar
+\textit{system} to evaluate the performance.  Radar systems frequently
+present very unusual constraints which may be very cleverly addressed
+if one's engineering judgment is not clouded by conventional
+electronic systems.
+
+\begin{example}
+A 3 GHz radar with a 30 dBi antenna observes an aircraft with $\sigma
+= 100 \textrm{m}^2$ at a range of 100 km.  What is $P_R/P_T$?
+
+\answer{Noting that 30 dBi is a factor of 1000 in gain, we have
+\begin{displaymath}
+\frac{P_R}{P_T} = \frac{G^2\lambda^2\sigma}{(4\pi)^3 R^4} = 5\times
+10^{-20}
+\end{displaymath}
+or about -193 dB.}
+\end{example}
+
+\begin{example} In the previous example, suppose the TX power is 100
+  kW.  What is the receiver voltage (into $50 \Omega$)?
+
+\answer{Continuing, we find that the actual received power is $5\times
+  10^{-15} = \frac{V^2}{2\cdot 50}$, thus the RMS voltage is $0.707
+  \mu$V. }
+\end{example}
+
+
+
+\subsection{non-isotropic Targets}
+
+We assumed that the target scattered isotropically, but this turns out
+to be a poor approximation --- there are literally (and provably) no
+isotropic scatters at all.
+
+In general $\sigma$ is therefor not a constant, but rather a function
+of 
+\begin{itemize}
+\item the direction of the illuminating radiation $\hat{\imath}$
+\item the direction of the scattered radiation $\hat{o}$
+\item the wavelength of the illumination
+\item the polarization of the illuminating radiation,
+\item the polarization of the scattered radiation
+\end{itemize}
+So, we should more generally write
+\begin{displaymath}
+\sigma \rightarrow \underline{\underline{\sigma}}(\hat{\imath},\hat{o},k)
+\end{displaymath}
+where the double underline indicates the tensor nature of $\sigma$
+scattering between various polarization states.  In the radar equation
+above one would have to replace the appearance of $\sigma$ with
+something like
+$\hat{p}_i\cdot\underline{\underline{\sigma}}(\hat{\imath},\hat{o},k)\cdot\hat{p}_o$,
+where $\hat{p}_{i,o}$ is the polarization state of the incoming and
+outgoing waves.
+
+\subsection{Deep (wide) Targets}
+
+The ``point target'' version of the Radar Equation is misleading for
+``deep targets'' such as weather, which fill the antenna beam
+pattern.  Such targets are described not by scattering cross section,
+but rather by ``volume scattering cross section,'' given the symbol
+$\sigma_v$ and having units ``area/volume''.  For such targets, the
+total cross section $\sigma = \sigma_v V$ where $V$ is the illuminated
+volume.  Thus
+\begin{eqnarray}
+\sigma &=& \sigma_v V \\
+V &=& R^2 \Omega \Delta R \\
+\Delta R &=& \textrm{range resolution} \\
+\Omega &=& \frac{4\pi}{G} = \textrm{Antenna Beam Solid Angle}
+\end{eqnarray}
+We'll see that the range resolution $\Delta R$ is related to the
+bandwidth of the transmitter waveform and the receiver impulse
+response.
+
+Substituting the volume scatterer in the Radar Equation, we have the
+monostatic deep target formula,
+\begin{equation}
+P_R = \frac{P_T G \sigma_v \Delta R}{(4\pi)^2 R^2}
+\end{equation}
+Notice that this has different dependence upon gain $G$ (appears once)
+and range $R$ (appears squared, not quarticly).
+
+\subsection{Line Targets}
+
+There are also targets which fill the antenna beam in one direction,
+but are small in the other.  Examples include radars looking obliquely
+at ocean surface, and nearly all synthetic aperture radars (although
+in the latter case the actual resolution needs more careful
+description).
+
+Without belaboring the point, we expect that the signal decreases like
+$1/R^3$ for such ``line'' targets, and the antenna pattern interacts
+in a somewhat more complicated way.
+
+\subsection{Absorption}
+So far we have assumed that the targets don't absorb any of the
+radiation.  There are some subtle jargon issues about the definition
+of scattering cross section when absorption is significant.
+
+\subsection{Stealthy Vehicles}
+
+Suppose a target with $\sigma = 100$ m$^2$ is ``just detectable'' at
+$R = 100$ km.  By how much must the target reduce its scattering cross
+section to avoid detection until $R = 10 $km?  Since there is a $R^4$
+in the Radar Equation, decreasing the range by a factor of ten
+increases the sensitivity by a factor of 10,000!  So the cross section
+would have to be reduced to 0.01 m$^2$ --- an enormous engineering
+challenge.
+
+Two general techniques are available for reducing the scattering cross
+section.
+\begin{itemize}
+\item Radar Absorbing Materials (RAM) which literally ``soak up'' the
+  incident radiation.  Such materials tend to be bandwidth specific,
+  and typically for microwave frequencies.
+\item Minimization of backscatter cross section through shape
+  control.  As most radars are monostatic, one can achieve stealth by
+  controlling the shape so that the radiation scatters in directions
+  other than the ``back'' direction.  This feature explains the
+  peculiar shape of the so-called ``Stealth Fighter'' jet.
+\end{itemize}
+When vehicles wish to elude detection, an additional tactic is trajectory planning.
+
+
+%%%%%%%%%%%%%%%%%%%
+
+
+\section{Noise, Clutter, and Interference}
+
+Although we now are able to estimate the size of the scattered signal
+through the Radar Equation, we do not yet have a means to know how
+detectable such signals are, which is to say, ``Is the power $P_R$ large
+or small compared to other signals which are distracting, such as
+noise, interference, jamming, and clutter?''
+
+\subsection{Noise}
+
+Very briefly, noise is a random signal that arises from finite
+temperatures and stochastic processes in Nature.  There are many kinds
+of noise processes, but for the immediate task at hand, we'll limit
+our attention to ``white noise,'' which is characterized by a power
+spectral density,
+\begin{eqnarray}
+\frac{dP_n}{df} &=& k_B T_{sys} \\
+P_n &=& k_B T_{sys} B
+\end{eqnarray}
+where $k_B$ is Boltzmann's constant, $1.38\times 10^{-23}$
+W/Hz/$^\circ$K; and $T_{sys}$ is the receiver system temperature,
+$^\circ$K; and $B$ is the receiver bandwidth, Hz.  In the vicinity of Earth, the thermal noise
+power spectral density as shown is essentially constant below 10 THz.   Thus the
+spectrum is flat, hence the name ``white noise.''  
+
+The system temperature can take some care to define and measure.  Very
+loosely speaking, modern receivers can be built without difficulty
+which achieve a $T_{sys} = 1000 ^\circ$K.
+
+The receiver bandwidth is often set equal to the transmitter bandwidth
+in a fairly precise way that will be discussed in the section on
+matched filters\footnote{add ref to matched filters section}.  It can
+often be well approximated by the inverse of the transmitter pulse
+width.  However, for aerospace radar systems, dynamic range can be improved by making the
+receiver bandwidth large compared to the transmitter bandwidth.
+
+Given the system temperature and the receiver bandwidth, we can now
+provide a formula for the Signal To Noise Ratio (SNR) which
+\textit{does} provide a good measure of detectability, and in the
+monostatic, point target case we have
+\begin{equation}
+\textrm{SNR} = \frac{P_r}{P_n} = \frac{P_t G^2 \lambda^2
+  \sigma}{(4\pi)^3 R^4 \; k_B T_{sys} B}
+\end{equation}
+
+\subsection{Clutter} \index{clutter}
+
+It would be a wonderful situation if we could arrange for the
+transmitter energy to be deposited only upon the targets that we
+wished to detect.  However, both uninteresting and interesting targets 
+return power to the receiver.  It is very often the case that the
+uninteresting signal power greatly exceeds the interesting signal
+power.  Fortunately it is also often the case that the clutter has
+Doppler content that is different from that of the desired targets
+(e.g. airplanes) so that it may be possible to distinguish relatively
+small target signals amongst otherwise enormous clutter signals.
+
+Some clutter has Doppler content, however.  Weather signals include
+wind, turbulence, and rain.  Long range radars looking for aircraft
+may see turbulence in the ionosphere, and troublesome multipath
+scattering from ocean surfaces, etc.
+
+\subsection{Interference and Jamming}
+
+Detection of target signals may be impeded by signals radiated from
+electronic equipment or other transmitters.  The ``interference
+power'' is that due to accidentally received signal; if the
+interference is purposeful it is called ``jamming'' or Electronic Counter Measures (ECM).
+
+\subsection{Chaff and Decoys} \index{chaff}
+
+It is sometimes possible to create objects with low mass but large
+radar cross section whose purpose is to befuddle a radar.  For
+example, an airplane may drop small lengths of wire, or metallized
+mylar film to create a large and distracting ``cloud'' from which the
+aircraft can escape.  Similarly, one of the arguments against
+Ballistic Missile Defense is that it is relatively easy to release
+decoys from the ballistic missiles which distract from the task of
+sensing the ``important'' missile payloads.
+
+\subsection{ECM and ECCM} 
+
+\index{EW} \index{EW!electronic warfare}
+\index{EW!ECM} \index{EW!electronic countermeasures}
+
+ECM and ECCM (``electronic counter-countermeasures'') encompass a large
+progression of tactics for foiling radars and subsequently making
+radars tougher to fool.  These techniques lie under the general rubric
+of Electronic Warfare (EW) for which this text will have little to
+say in detail.
+
+%%%%%%%%%%%%%%
+
+\section{Aliasing}
+
+Radars sample the scattering volume in some fashion and pass their
+data to digital signal processors.  Because the targets are sampled at
+a finite rate, there is a possibility that they will be undersampled
+in the Nyquist sense, which will impact the ability of the radar
+operator to correctly estimate the Doppler shift.  In general one
+compensates for this by increasing the sample rate.  However, radars
+present an additional antagonistic kind of aliasing which may prevent
+this.
+
+\subsection{Range-Time Diagram}
+
+The range-time diagram provides a simple means to figure out where the
+radio pulses are in space time.  The idea is to plot time
+horizontally, and range vertically; lines with positive slope are
+outgoing waves, and those with negative slope are incoming radio
+waves.  ``Events'' are located at points in space time, and include
+the emission of a particular radio pulse, or the scattering of a
+particular pulse.
+
+\centerline{OBVIOUS FIGURE GOES HERE; see page 15 of scanned notes}
+
+\subsection{periodic pulses}
+
+The most common transmitter operation involves sending pulses
+periodically.  If a target is 100 km distant, then sending pulses with
+150 km separation (upon return), or 1 ms provides enough room for the
+target echo to return before the subsequent transmitter pulse exits.
+
+\centerline{FIGURE}
+
+\subsection{range aliasing}
+
+However it is also possible to send the transmitter pulses more
+frequently.  If the target remained at 100 km, but the pulse period
+was reduced to 0.5 ms, then a second transmitter pulse would leave
+before the first echo returned.  The target would still appear delayed
+by 100 km from the pulse which illuminated it, however it would also
+appear to be only 25 km from the second pulse.  If all the pulses are
+identical then there would be no obvious way to determine that the
+target was at 25 km, 100 km, or any integer multiple of 75 km from 100
+km.  
+
+Targets whose distance exceeds the pulse spacing are said to be range
+aliased. 
+
+\subsection{Doppler aliasing}
+
+\subsection{Overspread and Underspread targets}
+

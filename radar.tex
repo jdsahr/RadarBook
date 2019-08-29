@@ -1,0 +1,255 @@
+% $Id: radar.tex,v 1.5 2007/06/09 18:58:09 jdsahr Exp $
+
+\documentclass[12pt]{book}
+
+\nonstopmode
+
+\usepackage{makeidx}
+\usepackage{epsfig}
+
+% \usepackage{layout}
+
+\input{macros}
+
+%\theoremstyle{plainn}
+% \newtheorem{thm}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{defn}{Definitions}[section]
+
+%\newcommand{\answer}[1]{}
+\newcommand{\answer}[1]{\noindent \textbf{Answer}: {#1} }
+
+% \newfont{\jds}{cmr12 at 24pt}
+
+\title{Radar Remote Sensing of Deep Fluctuating Targets}
+\author{John D. Sahr}
+
+\makeindex
+\typeout{hello}
+\begin{document}
+
+\maketitle
+
+\rule{0mm}{0mm}
+\vfill
+
+\centerline{\copyright{1999--2017} by John D.~Sahr}
+
+\vfill
+
+\rule{0mm}{0mm}
+
+\tableofcontents
+
+\newpage
+% \layout
+
+\part{Basics}
+
+\include{chapter1}
+\include{chapter2}
+\include{chapter3}
+
+\part{Radar Waveforms}
+
+\include{chapter4}
+\include{chapter5}
+
+\include{chapter-CorrelationCodes}
+
+\part{Estimation}
+
+\include{chapter-Estimation}
+\include{chapter-Detection}
+
+\part{Appendices}
+
+\appendix
+
+\include{chapter-DopplerProp}
+\include{chapter-Math-Reference}
+\include{chapter-Ambiguity}
+\include{chapter-CramerRao}
+\include{chapter-digitizers}
+\include{chapter-analytic}
+
+\chapter{Hysell--Chau}
+HC6 refers to the paper by Hysell and Chau, 2006\cite{hysell2006optimal}.
+visibility from a baseline pair
+\begin{eqnarray}
+V(k(\vec{d}_n - \vec{d}_m)) &=& \int_{4\pi} A_n(\Omega) A^\ast_m(\Omega) B(\Omega) \exp(j k (\vec{d}_n - \vec{d}_m)\cdot \vec{\Omega}) \; d\Omega \\		
+V(k\vec{d}_{nm}) &=& \int_{4\pi} B'_{nm}(\Omega) \exp(j k \vec{d}_{nm} \cdot \vec{\Omega}) \; d\Omega \label{e:vis0} \\
+A_n(\Omega)      &=& n\textrm{th antenna response in direction } \Omega \\
+B(\Omega)           &=& \textrm{image brightness in direction } \Omega \\
+B'_{nm}(\Omega) &=& A_n(\Omega)A^\ast_m(\Omega) B(\Omega) \\
+\vec{d}_n             &=& n\textrm{th antenna position} \\
+\vec{d}_{nm}        &=&  \vec{d}_n - \vec{d}_m \;\;\; \textrm{antenna pair separation; baseline}
+\end{eqnarray}
+Note that the brightness $B$ properly has units of Watts/sr, so that the integral \eqref{vis0} can be interpreted as a dot 
+product between $\exp(j k \vec{d}_{nm} \cdot \vec{\Omega})$ and $B'_{nm}(\Omega) \; d\Omega$ when both are
+suitably sampled over the domain of integration.  In this case we may write
+\begin{equation}
+V(k\vec{d}_{nm}) = (B'(\Omega^i)d\Omega)\exp(j k \vec{d}_{nm} \cdot \vec{\Omega^i})  
+\end{equation}
+or more simply
+\begin{eqnarray}
+V(k\vec{d}_{nm}) &=& B^i h^i_{nm} \\
+B^i       &=& B'(\Omega^i) d\Omega \\
+h^i_{nm} &=&\exp(j k \vec{d}_{nm} \cdot \vec{\Omega}^i) \label{e:hnm}
+\end{eqnarray}
+In \eqref{hnm}, $\Omega$ can be thought of as both as a solid angle and as a unit vector.
+
+Finally, we observe that carrying both $n$ and $m$ is a bit superfluous, and we'll enumerate the baselines $nm$ 
+simply as $j$\footnote{However, we'll need the $nm$ form to deal with closure phase and amplitude later.  It is 
+unfortunate that the integer subscript $j$ is overloaded with the imaginary unit.  However, since there are no 
+complex quantities in MEM imaging the problem should be minor, and the context clear.}.
+So, finally we write
+\begin{eqnarray}
+V(k\vec{d}_j) &=& B^i h^i_j \\
+B^i       &=& B'(\Omega^i) \; d\Omega \\
+h^i_j    &=&\exp(j k \vec{d}_j \cdot \vec{\Omega}^i)
+\end{eqnarray}
+HC6 refer to $h^i_j$ as the point spread function; it's important to note that this is the point spread function for
+isotropic antennas only (HC6 later include the antenna gain patterns $A(\Omega)$.)
+
+Measurements:
+\begin{eqnarray}
+g_j + e_j &=& f^i h^i_j \\
+g_j         &=& \textrm{(imperfectly) measured visibility; the data} \\
+e_j         &=& \textrm{error in true visibility measurement} \\
+f^i           &=& \textrm{modeled image brightness per pointing direction, } \\
+h^i_j      &=& \textrm{interferometric point spread function} \\
+f^i h^i_j &=& \int_{4\pi} 
+\underbrace{ \exp(j k \vec{d_j}\cdot \vec{\Omega}) }_{h^i_j}\; \underbrace{B'(\Omega) \; d\Omega}_{f^i} 
+\end{eqnarray}
+The last is a restatement of \eqref{vis0}.
+
+Also note that notationally it is not possible for $h^i_j$ to remain complex valued; the real and imaginary 
+parts have to be handled explicitly and separately in the Maximum Entropy formulation.  So, if there are 
+$N$ antennas, then there are $N(N-1)/2$ baselines, and $N(N-1)$ real and imaginary components.  Thus,
+algorithmically, $j$ runs from $0$ to $N(N-1) -1$.
+\begin{eqnarray}
+h_j^i &=& \cos(k\vec{d}_j \cdot \vec{\Omega}^i ) \;\;\;\;\; \textrm{for } j \textrm{ even} \\ 
+h_j^i &=& \sin(k\vec{d}_j \cdot \vec{\Omega}^i) \;\;\;\;\; \textrm{for } j \textrm{ odd}  
+\end{eqnarray}
+It may be convenient to duplicate each baseline, algorithmically, so that $\vec{d}_{2n} = \vec{d}_{2n+1}$.
+
+The total brightness is assumed to be a measured quantity; it occurs as a self correlation measurement rather
+than a correlation between two antennas:
+\begin{eqnarray}
+F   &=& I^i f^i \\
+     &\sim&  \int_{4\pi} B'(\Omega) \; d\Omega
+\end{eqnarray}
+
+Below we shall see an additional parameter, $Z$, which provides a normalization and Gibbs function for the MEM 
+image.  A close reading of HC6 reveals what appears to be a tautology regarding $F$ and $Z$.  This tautology 
+can be avoided by extending the interferometric baselines to include the $0$ baseline, in which the total power of 
+the image scene arises naturally within the MEM model.  As an additional benefit, the zero 
+baseline demonstrates its use a a "sharpness" or "focussing" parameter.   For small values of $\lambda_j$ ($
+\lambda_j \le 1$) the MEM model is nearly linear in the Fourier sense, however for larger values of $\lambda_j$ 
+the model can produce very sharp features.  This is one of the strengths of the MEM approach; it can rise to the 
+occasion of super resolution given appropriate data.
+
+Image entropy:
+\begin{eqnarray}
+S &=& -f^i \log(f^i/F) \\
+&\sim& \int_{4\pi} B'(\Omega) \log( B'(\Omega)/F) \; d\Omega
+\end{eqnarray}
+
+The MaxEnt image model is
+\begin{eqnarray}
+f^i &=&\frac{F}{Z}\exp(-\lambda_j h_j^i) \\
+Z &=& I^i \exp(-\lambda_j h_j^i)
+\end{eqnarray}
+for some $\lambda_j$ to be determined.  Note that
+\begin{equation}
+\log(f^i) = -\lambda_j h_j^i
+\end{equation}
+and we can write the entropy as
+\begin{eqnarray}
+S &=& -f^i\log((F/Z)\exp(-\lambda_j h_j^i)/F) \\
+ &=& f^i \lambda_j h_j^i + f^i I^i\log(Z) \\
+ &=& f^i \lambda_j h_j^i + F \log Z
+\end{eqnarray}
+
+
+Functional to be maximized including noise, 
+
+\begin{eqnarray}
+E(f(e_j, \lambda_j, \Lambda)) &=& S + \lambda_j(g_j + e_j - f^i h^i_j) + \Lambda(e_j^2 \sigma_j^{-2} - \Sigma) \\
+&=& -f^i \log(f^i/F)+ \lambda_j(g_j + e_j - f^i h^i_j) + \Lambda(e_j^2 \sigma_j^{-2} - \Sigma) \nonumber \\
+&=& f^i \lambda_j h_j^i + F \log(Z) + \lambda_j(g_j + e_j - f^i h^i_j) + \Lambda(e_j^2 \sigma_j^{-2} - \Sigma) \nonumber \\
+&=& \lambda_n(g_j + e_j) + F \log Z + \Lambda(e_j^2 \sigma_j^{-2} - \Sigma) 
+\end{eqnarray} 
+
+Differentiating with respect to $\lambda_j, e_j, \Lambda$ we receive these equations to solve:
+\begin{eqnarray}
+g_j + e_j - f^i h^i_j &=& 0 \\[1em]
+\lambda_j + \frac{2\Lambda}{\sigma_j^2} e_j &=& 0 \\[0.5em]
+\Lambda^2 - \frac{\lambda_n^2 \sigma_n^2}{4\Sigma} &=& 0
+\end{eqnarray}
+
+In the case of no noise, we have
+\begin{eqnarray}
+g_j - f^i h^i_j &=& 0 
+\end{eqnarray}
+
+This could be useful for generating initial conditions.
+
+\section{another whack}
+
+The formulation of HC6 accommodates correlated errors among the $g_j$ through a similarity transform, and 
+that's a good thing.
+
+One of the surprising things about he solution of the coupled equations E.35-37 is that, given a set of $g_j$, and 
+a solution $\lambda_j$ to them, the numerical solution $\lambda_j$ is extremely stable to variations of $g_j$.  
+While initially satisfying, this leads to the puzzling circumstance that very few solutions are actually possible; or, to 
+put it differently, in the noiseless case (perfect data $g_j$) the synthesized image is not a smooth function of the 
+data.  A little investigation of this reveals that the MaxEnt image model is very stiff.  
+
+\begin{eqnarray}
+\Phi &=& \int \exp(-\lambda_k f_k(\Omega)) \;d\Omega \\
+\Phi_n &=& \partial \Phi/\partial \lambda_n = \int -f_n(\Omega) \exp(-\lambda_k f_k(\Omega)) \;d\Omega = g_n \\
+\Phi_{nm} &=& \partial^2 \Phi/\partial \lambda_n \partial \lambda_m = \int f_n(\Omega) f_m(\Omega) 
+\exp(-\lambda_k f_k(\Omega)) \;d\Omega \\
+\Phi_{nm} &=& \textrm{symmetric, positive definite} \nonumber \\
+\Phi_{nm} \Delta \lambda_m &=& \Delta g_n \\
+\Delta \lambda_m &=& [\Phi_{nm}]^{-1} \Delta g_n
+\end{eqnarray}
+
+The issue is that $\Phi_{nm}$ (and its inverse) is typically quite stiff --- the condition number is large, the range of
+singular values/eigenvalues is large.  The error model is thus not so much estimating actual errors as it is 
+compensating for the stiffness of $\Phi_{nm}$.  It would be interesting to find an alternative model which was less 
+stiff, which would nevertheless preserve the friendly algebraic properties of the MaxEnt image model.
+
+One possibility is the following:
+\begin{eqnarray}
+\Phi &=& \int \exp(-\lambda_k f_k(\Omega)) \;d\Omega + \int \exp(-\alpha \lambda_k f_k(\Omega)) \;d\Omega \\
+&=&  \int \exp(-\lambda_k f_k(\Omega))\ + \exp(-\alpha \lambda_k f_k(\Omega)) \;d\Omega \\
+\Phi_n &=& -\int f_n(\Omega) \exp(-\lambda_k f_k(\Omega)) \;d\Omega + \cdots \nonumber \\
+ & & - \; \alpha \int f_n(\Omega) \exp(-\alpha \lambda_k f_k(\Omega)) \;d\Omega \\
+\Phi_n &=& -\int f_n(\Omega) [ \exp(-\lambda_k f_k(\Omega)) + \alpha  \exp(-\alpha\lambda_k f_k(\Omega)) ] \;d
+\Omega \\
+\Phi_{nm} &=& \int f_n(\Omega) f_m(\Omega) \exp(-\lambda_k f_k(\Omega)) \;d\Omega + \cdots \nonumber \\
+ & & + \; \alpha^2 \int f_n(\Omega) f_m(\Omega) \exp(-\alpha \lambda_k f_k(\Omega)) \;d\Omega \\
+\Phi_{nm} &=& \!\int \! f_n(\Omega) f_m(\Omega) [ \exp(-\lambda_k f_k(\Omega)) + \alpha^2  \exp(-\alpha
+\lambda_k 
+f_k(\Omega)) ] \;d \Omega 
+\end{eqnarray}
+This is clearly extensible.  One possibility would be
+\begin{equation}
+\Phi = \int e^{-\lambda_k f_k(\Omega)} +  e^{-\alpha \lambda_k f_k(\Omega)} + 
+e^{-\beta \lambda_k f_k(\Omega)} + e^{-\gamma \lambda_k f_k(\Omega)} \; d\Omega
+\end{equation} 
+\printindex
+
+\cleardoublepage
+
+\phantomsection
+
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliography{radar}
+\bibliographystyle{plain}
+
+
+\end{document}

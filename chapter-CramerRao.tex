@@ -1,0 +1,135 @@
+\chapter{The Cram\'er-Rao Lower Bound}
+\label{s:cramer-rao}
+
+The Cram\'er-Rao Lower Bound (CRLB) provides an absolute lower bound
+on the variance of estimators of functions of parameters in the pdf of
+random variables, given a knowledge of the functional form of the pdf.
+
+\section{single parameter case}
+
+Let us first consider the case of an estimate of a single parameter of a
+random variable\footnote{The proof given is based upon a proof
+found in the Wikipedia on 14 July 2007
+\texttt{http://en.wikipedia.org/wiki/Cram\'er-Rao\_bound\#Single-parameter\_proof}}.
+Consider a set of data $x$ which has a pdf $f(x; \theta)$ that depends
+upon a parameter $\theta$.  For example, $\theta$ could represent the
+mean or standard deviation of the random variable.  Let us form an
+estimator of the data $t(x)$ which produces the new random variable
+$T$; we'll show all the intermediate steps, for clarity, as some of
+the manipulations can appear magical upon first encounter:
+\begin{eqnarray}
+T &=& t(x) \\
+\langle T \rangle &=& \int t(x) f(x; \theta) \; dx = \psi(\theta)
+\end{eqnarray}
+Since the pdf is assumed to be normalized, we also have the following
+curious result:
+\begin{eqnarray}
+\int f(x; \theta) \; dx &=& 1 \\
+\frac{\partial}{\partial \theta} \int f(x; \theta) \; dx &=&
+\frac{\partial}{\partial \theta} \; (1) = 0 \\
+\int \frac{\partial}{\partial \theta} f(x; \theta) \; dx &=& 0 \\
+\int \frac{\partial \log f(x; \theta)}{\partial \theta} \; f(x; \theta)
+\; dx &=& 0 \\
+\left\langle \frac{\partial \log f(x; \theta)}{\partial \theta} \right\rangle&=& 0 \\
+\textrm{define} \;\;\; V &=& \frac{\partial \log f(x ;\theta)}{\partial \theta} \\
+\langle V \rangle &=& 0
+\end{eqnarray}
+Now, consider the covariance of $T$ and $V$:
+\begin{eqnarray}
+\textrm{cov}(V,T) &=& \langle (T - \langle T \rangle)(V - \langle V
+\rangle)\rangle \\
+&=& \langle (T - \langle T \rangle) V\rangle \\
+&=& \langle T V \rangle - \langle \langle T \rangle V\rangle \\
+&=& \langle T V \rangle - \langle T \rangle \langle V\rangle \\
+&=& \langle T V \rangle \\
+&=& \int t(x) \frac{\partial \log f(x; \theta)}{\partial \theta} f(x;
+\theta)\; dx \\
+&=& \int t(x) \frac{1}{f(x; \theta)} \frac{\partial f(x;
+  \theta)}{\partial \theta} f(x; \theta) \; dx \\
+&=& \int t(x) \frac{\partial f(x; \theta)}{\partial \theta} \; dx \\
+&=& \frac{\partial}{\partial \theta} \int t(x) f(x; \theta) \; d\theta \\
+\textrm{cov}(V,T) &=& \frac{\partial \psi(\theta)}{\partial \theta}
+\end{eqnarray}
+Now, we examine the covariance by contemplating the Cauchy-Schwartz
+inequality \eqref{cauchy-schwarz-integral}; let $p(x) = T = t(x)$ and
+$q(x) = V$.  Then, the C-S inequality can be expressed as
+\begin{eqnarray}
+\textrm{var}(T) \textrm{var}(V) &\ge& \left(\textrm{cov}(V,T)\right)^2
+= \left(\frac{\partial \psi(\theta)}{\partial \theta} \right)^2 \\
+\rightarrow \;\; \textrm{var}(T) &\ge& 
+\frac{\left(\frac{\partial \psi(\theta)}{\partial \theta}\right)^2}
+     {\left\langle \left(\frac{\partial \log f(x; \theta)}{\partial \theta}\right)^2\right\rangle}
+\end{eqnarray}
+Note that the quantity in the denominator of the r.h.s. does not
+depend upon the data $x$ because the expectation has been taken.
+
+\chapter{Helpful Identies and Theorems}
+
+\section{Cauchy-Schwarz Inequality}
+
+\begin{equation} \label{e:cauchy-schwarz-integral}
+\left| \int p(x) q^\ast(x) f(x) \; dx \right|^2 \le 
+\int |p(x)|^2 f(x) \; dx \int |q(x)|^2 f(x) \; dx 
+\end{equation}
+Here, we require that $p, q$ are square integrable over the measure
+$f(x) \ge 0$.  The relation occurs in a discrete form as well:
+\begin{equation}
+\left| \sum_k p_k q_k^\ast f_k \right|^2 \le
+  \sum_k |p_k|^2 f_k \sum_k |q_k|^2 f_k
+\end{equation}
+In many opportunities for application, $f(x) = 1$ and $f_k = 1$.  In
+both the integral and discrete forms, equality arises if and only if
+$p$ and $q$ are identical within a constant scalar multiple.
+
+\section{Method of Lagrange Multipliers}
+
+Suppose that have a score function of several variables, including some constraints, and we wish to seek an optimum value:
+\begin{equation}
+\textrm{minimize } f(x, y, \ldots) \textrm{ such that } g_n(x, y, \ldots) = 0
+\end{equation}
+The usual approach would be to use the constraints $g_n()$ to express all the variables $x, y, \ldots$ in terms of one of the 
+variables (e.g. $x$), and then minimize the function $f(x, y(x), z(x), \ldots)$ with respect to $x$.
+
+We can then create the augmented function $f'(x, y, \dots; \lambda_1, \lambda_2, \ldots)$ as follows:
+\begin{equation}
+f'(x, y, \ldots; \lambda_1, \lambda_2, \ldots) = f(x, y, \ldots) + \lambda_1 g_1(x, y, \ldots) + \lambda_2 g_2(x, y, \ldots) + \ldots
+\end{equation}
+Now we form the all the partial derivatives and set them equal to zero:
+\begin{eqnarray}
+\frac{\partial f'}{\partial x} &=& \frac{\partial f'}{\partial x} + \lambda_1 \frac{\partial g_1}{\partial x}+ \lambda_2 \frac{\partial g_2}{\partial x} + \ldots = 0 \\
+\frac{\partial f'}{\partial y} &=& \frac{\partial f'}{\partial y} + \lambda_1 \frac{\partial g_1}{\partial y} + \lambda_2 \frac{\partial g_2}{\partial y} + \ldots = 0\\
+&\vdots& \\
+\frac{\partial f'}{\partial \lambda_1} &=& g_1(x, y, \ldots) = 0\\
+\frac{\partial f'}{\partial \lambda_2} &=& g_2(x, y, \ldots) = 0\\
+&\vdots&
+\end{eqnarray}
+You can see that the $\lambda$ derivatives simply return the constraints.   As presented this is not obviously an improvement, so let's illustrate with an example.
+
+\subsection{example of the method of  Lagrange Multipliers}
+
+Suppose that we have the following:
+
+\begin{eqnarray}
+\textrm{minimize } f(x, y) &=& 3 x + 5 y \\
+\textrm{such that } xy^2 &=& 4 \\
+\textrm{which can be written } xy^2 - 4 &=& 0
+\end{eqnarray}
+Then we form $f'$ and take partial derivatives.
+\begin{eqnarray}
+f'(x,y;\lambda) &=& 3 x + 5 y + \lambda(xy^2 - 4) \\
+\frac{\partial f'}{\partial x} &=& 3 + \lambda y^2 = 0 \label{e:lgm01}\\
+\frac{\partial f'}{\partial y} &=& 5 + 2\lambda xy = 0 \label{e:lgm02}\\
+\frac{\partial f'}{\partial \lambda} &=& xy^2 - 4 = 0 \label{e:lgm03}
+\end{eqnarray}
+If we solve (\ref{e:lgm01}) and (\ref{e:lgm02}) for $\lambda$ can recover the following relationship for $x$ and $y$.
+\begin{equation}
+y = \frac{6}{5}x \label{e:lgm04}
+\end{equation}
+In concert with the constraint (\ref{e:lgm02}) we have
+\begin{eqnarray}
+x\left(\frac{6}{5}x\right)^2 &=& 4 \\
+\frac{36}{25}x^3 &=& 4 \\
+x &=& (25/9)^{1/3} = 1.40572 \\
+y &=& \frac{2}{\sqrt{x}} = 2 \times (3/5)^{1/3} = 1.68686
+\end{eqnarray}
+Note that (\ref{e:lgm04}) provides a linear relationship between $x$ and $y$ which makes it easy to solve the constraint.

@@ -1,0 +1,553 @@
+% $Id: chapter3.tex,v 1.6 2005/02/01 01:16:12 jdsahr Exp $
+
+\chapter{Receivers}
+
+A receiver is the sensor which converts the scattered radio wave into
+an electic signal which is suitable for analysis.
+
+\section{Basic Receiver topologies}
+
+\subsection{noncoherent}
+
+power only detector.  Extremely simple.  Not very sensitive.  Can't do
+Doppler processing (probably).
+
+\subsection{direct conversion}
+
+set LO to transmitter frequency.
+advantages:
+\begin{itemize}
+\item simple
+\end{itemize}
+
+disadvantages
+\begin{itemize}
+\item LO pollution in the RX spectrum
+\end{itemize}
+
+\subsection{down conversion}
+
+Two (or more) frequency conversion operations.
+advantages
+\begin{itemize}
+\item higher performance
+\item no LO in RF spectrum
+\item access to good filter technologies
+\end{itemize}
+
+disadvantages
+\begin{itemize}
+\item higher cost
+\end{itemize}
+
+
+\subsection{analog nonlinearities in mixers and amplifiers}
+
+High performance receivers and measuring equipment (e.g. vector
+network analyzers) are frequently are performance-limited by
+nonlinearities lurking in various places in the system.
+
+Nonlinear behavior in components is not only difficult to accomodate;
+it is difficult to even describe, because it arises in many different
+ways.  
+
+A ``simple'' kind of nonlinearity arises because of finite limits on
+the power supply voltage for components --- clipping will eventually
+set in.  More subtle are the weak, intrinsic nonlinearities offered by
+amplifying and switching devices.
+
+In ``mixers'' we hope to achieve an ideal analog multiplication.
+Given two input signals $a(t), b(t)$ we would like to produce the
+product signal $c(t) = a(t) b(t)$.  For example, if $a(t), b(t)$ are
+a pair of sinusoidal signals with frequencies $f_a, f_b$, then the
+output signal $c(t)$ will contain a pair of sinusoids with
+frequencies $|f_a \pm f_b|$.
+
+\subsubsection{Square-Law systems}
+
+There is a basic topological problem with achieving an analog
+multiply operation: two inputs and one output.  However there is a
+trick that can be used to achieve multiplication if you have access
+to ``addition'' and ``squaring.''
+
+Consider two signals $a(t), b(t)$.  If their sum $a(t) + b(t)$ is
+passed through a squaring operation you have
+\begin{equation}
+(a(t) + b(t))^2 = a(t)^2 + b(t)^2 + 2 a(t) b(t)
+\end{equation}
+The first two terms are not desired, but the third is.  It may be
+possible to sufficiently suppress the first two by filtering. 
+
+However, it is useful to consider the square of the difference, too.
+\begin{equation}
+(a + b)^2 - (a - b)^2 = 4 ab
+\end{equation}
+This is a perfect multiply!  However, achieving this in analog
+circuits requires careful matching of the summing and squaring
+circuits to achieve the mathematical cancellation.
+
+\subsubsection{Junction Diodes}
+
+Junction Diodes are frequently used for mixers (multipliers) because
+of their well characterized nonlinear (exponential) current-voltage
+characteristic.
+\begin{eqnarray}
+I &=& I_0\left( e^{V/V_{th}} - 1 \right) \\
+I &=& I_0\left(\frac{V}{V_{th}}
++ \frac{1}{2}\left(\frac{V}{V_{th}}\right)^2 + \cdots \right)
+\end{eqnarray}
+
+\subsubsection{Diode Rings}
+
+concept of double balanced
+
+\subsubsection{Gilbert Cell}
+
+active mixer/diffamp gadget
+
+\subsubsection{Parametric}
+
+use a varactor ...
+
+\section{In Phase and Quadrature receivers}
+
+Usually wish to use the slowest possible sampler to minimize data flow
+through processor.  Lowest data rate is at baseband; achieve with some
+sort of single or multi conversion receiver.
+
+Basic problem --- can't tell sign of Doppler shift (spectrum of
+real-valued signals are symmetric).
+
+\begin{eqnarray}
+s(t) &=& A \cos(2\pi(f_0 + \Delta f)t) \\
+l(t) &=& \cos(2\pi f_0 t) \\
+s(t)l(t) &=& A \cos(2\pi(f_0 + \Delta f)t)\cos(2\pi f_0 t) \\
+&=& \frac{A}{2}\cos(2\pi \Delta f \,t) + \frac{A}{2}\cos(2\pi (2f_0)
+t) \\
+\textrm{LP}[s(t)l(t)] &=& \frac{A}{2}\cos(2\pi \Delta f \,t)
+\end{eqnarray}
+(LP indicates a ``low pass filter'' operation.)  In the last line,
+notice that you wouldn't be able to notice if $\Delta f$ changed sign.
+Same is true if $l(t) = \sin(2\pi f_0 t)$ --- the sign would change,
+but that could be absorbed into a phase shift.
+
+Idea: use both?
+
+
+\subsection{The IQ signal}
+
+If you use both cos and sin for the last detection, you get
+\begin{eqnarray}
+s(t) &=& A \cos(2\pi(f_0 + \Delta f)t) \nonumber \\
+ &=& \frac{A}{2}\left( \exp(2\pi j(f_0 + \Delta f)t) + \exp(-2\pi
+ j(f_0 + \Delta f)t) \right) \nonumber \\
+l(t) &=& \exp(-2\pi j f_0 t) \\
+s(t)l(t) &=& \frac{A}{2} \exp(2\pi j\Delta f)t) + 
+\frac{A}{2} \exp(2\pi j(-2f_0 - \Delta f)t) \\
+\textrm{LP}[s(t)l(t)] &=& \frac{A}{2}\exp(2\pi j \Delta f \,t)
+\end{eqnarray}
+
+Now the low pass signal has the unambiguous Doppler shift apparent.
+This is a very convenient signal.  Although it may be puzzling to
+think of at first, it really is as simple as having two wires, one
+with the real part and one with the imaginary part.
+
+\subsection{The Analytic Signal}
+
+In many treatments of radar and radio communications systems the
+theory of ``analytic signals'' and the Hilbert Transform are
+introduced at this point.  
+
+Although fascinating theory, knowing or not knowing that theory does
+not preclude one from using or understanding the IQ receiver.  We
+direct your attention to \cite{whalen,vantrees} if you would like to
+learn more about this.  For the moment, suffice it to say that one can
+formally create an ``analytic signal'' $\tilde{u}(t)$ from a real
+signal $u(t)$ as follows:
+\begin{eqnarray}
+\tilde{u}(t) &=& u(t) + \jmath u_H(t) \\
+u_H(t) &=& {\cal H}[u(t)] = u(t) \ast \frac{1}{\pi t} \\
+       &=& \frac{1}{\pi} P \int_{-\infty}^\infty \frac{u(s)}{s - t}\; ds
+\end{eqnarray}
+Here $P\!\!\int$ means that the ``principle value'' of the integral is
+taken, avoiding the singularity at $s=0$.  The (complex valued)
+analytic signal $\tilde{u}(t)$ has the interesting property that it
+has identically zero spectral content for negative frequencies. 
+
+\subsection{analog IQ receivers}
+
+In an analog IQ receiver, near the end of the downconversion chain,
+the local oscillator will be split and phase shifted, with a cosine()
+signal on one wire, and a sine() signal on the other.  The original
+signal is then mixed against each of these oscillators and lowpass
+filtered to produce the desired IQ baseband signal.
+
+problems
+\begin{itemize}
+\item such mixers often (always?) have a DC offset, which leads to
+  excess power in the zero frequency spectral channel.
+\item different gain through I and Q channels leads to L-R spectrum
+  pollution.
+\item imperfect 90 degree phase shift between cosine and sine leads to
+  L-R spectrum pollution
+\item if the two LP filters in the I and Q channels are not perfectly
+  matched, results in (complicated) L-R spectrum pollution.
+\item Different ADCs could have different gains, nonlinearities ...
+\end{itemize}
+
+\section{Digital Receivers}
+
+Modern digital receivers eliminate many of the limitations of
+conventional analog IQ detectors, by implementing the last down
+(IQ) conversion and subsequent low pass filtering entirely as digital
+computations. 
+
+advantages
+\begin{itemize}
+\item A single digitizer eliminates differential performance
+\item $\exp(2\pi j f_0 t)$ is generated digitally --- ``perfect''
+  quadrature is available
+\item mixing/down conversion operations are digital, hence the I and Q
+  channels are essentially perfectly matched.
+\end{itemize}
+
+disadvantages
+\begin{itemize}
+\item probably too expensive for very cheap receivers
+\item ...?
+\end{itemize}
+
+Basically they are wonderful.
+
+
+\section{The Matched Filter}
+
+ When a transmitter emits a signal $g(t)$, it scatters from a target
+and is detected by a receiver with an impulse response $h(t)$, so that
+                   the detector output is $s_o(t)$,
+\begin{eqnarray}
+s_o(t) &=& h(t)\ast g(t) \\
+       &=& \int h(\tau) g(t-\tau) d \tau
+\end{eqnarray}
+Of course, noise will be entering the receiver, too.  Letting $n(t)$
+be the input noise, the output noise $n_o(t)$ is just 
+\begin{eqnarray}
+n_o(t) &=& h(t)\ast n(t) \\
+       &=& \int h(\tau) n(t - \tau) d \tau
+\end{eqnarray}
+This is a mathematically handy step, because $n(t)$ has infinite
+bandwidth.  This issue lead to the so-called ``ultraviolet
+catastrophe'' early in the Twentieth Century.  If the power spectral
+density is constant, and the noise has infinite bandwidth, then that
+means that noise has infinite power!  The solution was provided by
+Quantum Mechanics and the Planck Radiation Law, which showed that,
+above a certain, temperature-dependent frequency, the noise power
+spectral density falls of quite dramatically --- yielding finite noise
+power at finite temperature, for infinite
+bandwidth\footnote{buzzwords: Planck Radiation Law, Rayleigh-Jeans
+  Law, Blackbody Radiation}.
+
+So, how much signal power and noise power do we get?  Start with noise
+power. 
+\begin{eqnarray}
+P_n &=& \langle n_o(t)^2 \rangle \\
+    &=& \left\langle \left[ \int h(\tau) n(t-\tau) d\tau
+    \right]^2\right\rangle \\
+    &=& \left\langle \left[ 
+    \int h(\tau) n(t-\tau) d\tau \int h(\tau') n(t-\tau') d\tau'
+    \right]\right\rangle \\
+    &=& 
+    \int \int h(\tau) h(\tau') \langle n(t-\tau) n(t-\tau') \rangle
+    d\tau' d\tau \\
+    &=& \int \int h(\tau) h(\tau') N_0 \delta(\tau - \tau') d\tau' d\tau \\
+    &=& N_0 \int \left| h(\tau)\right|^2 d\tau \\
+P_n &=& \frac{N_0}{2} \int_{-\infty}^\infty \left| H(f) \right|^2 df
+\end{eqnarray}
+
+Now, what is the signal power $P_s$?
+\begin{eqnarray}
+P_s &=& (s_o(t))^2 \\
+P_s &=& \left| \int h(\tau) g(t-\tau) \; d\tau \right|^2 \\
+    &=& \left| \int H(f) G(f) e^{2\pi j f t} \; df \right|^2
+\end{eqnarray}
+Now, let's look at the Signal to Noise Ratio\index{signal to noise
+ratio} (SNR\index{signal to noise ratio!SNR}),
+\begin{equation}
+\textrm{SNR} = \frac{P_s}{P_n} = 
+\frac{\left| \int_{-\infty}^\infty H(f) G(f) e^{2\pi j f t} \; df \right|^2}
+      {(N_0/2)  \int_{-\infty}^\infty \left| H(f) \right|^2 df}
+\end{equation}
+We would like to maximize this ration, but choosing the right time
+$t$ to observe the signal, as well as the best impulse response
+$h(t) \leftrightarrow H(f)$ given the transmitter waveform $g(t)$ to
+maximize the ratio.  
+
+There are a variety of ways to go about this, but the most
+straightforward approach makes use of the Cauchy-Schwartz
+Inequality\index{Cauchy-Schwartz Inequality}, which states that, for a
+pair of (possibly complex valued) functions $A(p), B(p)$, we have
+\begin{equation}
+\left|\int A(p) B(p) \; dp \right|^2 \le \int |A(p)|^2 \; dp \int |B(p)|^2\; dp
+\end{equation}
+and, furthermore equality is achieved if and only if $A(p) =
+kB^\ast(p)$ for some (possibly complex) scalar constant $k$.
+
+In this case, by identifying $H(f) = A(f)$ and
+$G(f)\exp(2\pi j f t) = B(f)$ we see immediately that the maximum SNR
+is achieved when
+\begin{eqnarray}
+G(f) e^{2\pi j f t} &=& kH^\ast(f) \\
+g(\tau) &=& kh^\ast(\tau)
+\end{eqnarray}
+for some constant $k$.  Also, the value of the maximum SNR can be
+computed:
+\begin{eqnarray}
+\textrm{SNR}_{\textrm{max}} &=& 
+  \frac{\int |H(f)|^2\; df  \; \int |G(f) e^{2\pi j f t}|^2 \; df}
+      {(N_0/2)  \int\left| H(f) \right|^2 df} \\
+  &=& \frac{\int |G(f) e^{2\pi j f t}|^2 \; df}{(N_0/2)} \\
+  &=& \left. \frac{P_o(t)}{N_0/2} \right|_{\textrm{t=t}_m}
+\end{eqnarray}
+Here, $t_m$ is the time which maximizes the ratio ---
+i.e. appropriate to the time-of-flight --- and $N_0$ is the one-sided
+noise power spectral density $k_B T_{sys}$.
+
+It is worth commenting on some limitations of the matched filter.
+\begin{itemize}
+\item The development above was predicated upon the whiteness of the
+noise (flat spectrum).  However, a non-white noise spectrum can be
+accomodated with a straightforward extension, which is to
+``pre-whiten'' the detector.  See \cite{whalen-1971} for details.
+\item The development above ignored the possibility of clutter.  The
+matched filter is not necessarily optimal in the presence of
+clutter.  However, in practice the matched filter is likely to be
+near-optimal.
+\item The development above ignored the possibility of several
+targets.  This is a restatement of the problem of clutter.  Although
+the matched is not necessarily optimal, it is very likely to be near
+optimal.
+\end{itemize}
+
+\subsection{Square Pulse}
+
+Transmit a square pulse $g(t)$ of duration $\tau$, matched filter
+detect, get a triangle function $s_o(t) = g(t)\ast g(-t)$.
+
+\centerline{figure}
+
+This gives us a more sophisticated way of viewing range resolution
+... 
+
+\section{The Ambiguity Function}
+
+\newcommand{\infint}{\int_{-\infty}^\infty}
+
+Response of a (possibly matched) filter to a doppler shifted signal.
+
+Suppose transmitter waveform $u(t)$, then matched impulse response is
+$u^\ast(-t)$.  The output of matched filter is $u(t) \ast u^\ast(-t)$
+evaluated at time $t$,
+\begin{eqnarray}
+u_o(t) &=& \infint u(t-s) u^\ast(-s) \; ds \\
+&=& \infint u(t+s) u^\ast(s) \; ds \\
+&=& \infint u(s) u^\ast(s-t) \; ds %\\
+%&=& \infint u\left(s+\frac{t}{2}\right) u^\ast\left(s-\frac{t}{2}\right) \; ds 
+\end{eqnarray}
+Suppose we also Doppler shift the transmitter signal $u(t) \rightarrow
+u(t) \exp(2\pi j \nu t)$, then response is
+\begin{eqnarray}
+\chi(\tau,\nu) &=& \infint u(s) e^{2\pi j \nu s} u^\ast(s-\tau)\;
+ds  \label{e:AF-def}
+\end{eqnarray}
+Here $\chi(\tau,\nu)$ is the ``Ambiguity Function''.\index{ambiguity
+function}  Note that several approximately equivalent forms are
+defined by different authors.
+
+The ambiguity function indicates the sensitivity of a matched filter
+to point targets which are delayed by $\tau$ and Doppler shifted by
+$\nu$ from the peak response at $\tau = 0$ and $\nu = 0$.
+
+\subsection{Properties of the Ambiguity Function}
+
+After \cite{levanon}
+
+\begin{enumerate}
+\item Normalization.  Using the Cauchy-Schartz inequality, we can
+  rapidly show that 
+\begin{equation} 
+|\chi(\tau,\nu)| \le |\chi(0,0)| = 1
+\end{equation}
+where we scale the amplitude of $u(t)$ so that $\chi(0,0) = 1$.  The
+implication is that the matched filter has its greatest sensitivity
+when the targets are not relatively delayed, and have no Doppler
+shift.
+\item Conservation of Ambiguity.  
+\begin{equation}
+\int\!\!\infint |\chi(\tau,\nu)|^2 \; d\tau d\nu = 1
+\end{equation}
+This implies that, although the shape of the ambiguity surface can
+change, the volume beneath that surface is preserved.  This has
+tremendous ramifications for waveform design.
+\item Symmetry.  
+\begin{equation}
+|\chi(\tau,\nu)| = |\chi(-\tau,-\nu)|
+\end{equation}
+\item Linear FM.  Application of a linear FM chirp distorts the
+  ambiguity plane in a simple way:
+\begin{equation}
+\textrm{if}\;\; u(t) \rightarrow |\chi(\tau,\nu)| \;\;\; \textrm{then} \;\;\;
+                u(t) \exp(\pi j \kappa t^2) \rightarrow |\chi(\tau,
+                \nu + \kappa \tau)|
+\end{equation}
+
+\end{enumerate}
+
+\subsection{Other Forms of the Ambiguity Function}
+
+\subsubsection{Wigner Distribution}
+
+A slightly different version of the ambiguity function is known as the
+Wigner or Wigner-Ville Distribution. \cite{something}.
+\begin{equation}
+\chi_w(\tau,\nu) = \infint u(t + \tau/2) u^\ast(t-\tau/2) e^{2\pi j\nu t} \; dt 
+\end{equation}
+It is straightforward to show a simple relationship to $\chi$:
+\begin{equation}
+\chi_w(\tau,\nu) = e^{-\pi j \nu \tau} \chi(\tau, \nu)
+\end{equation}
+The Wigner Distribution has the nice property of complex symmetry, rather than
+merely magnitude symmetry (property 3 above).
+\begin{equation}
+\chi_w(\tau,\nu) = \chi^\ast_w(-\tau,-\nu) 
+\end{equation}
+While $\chi_w$ is a little more awkward for computation, it may be more convenient for some proofs.
+APPENDIX D elaborates on this topic.
+
+\subsection{Fourier-Transformed form} 
+
+Using the Fourier Transform relations found in appendix
+\ref{fourier-transform}, page \pageref{fourier-transform}
+we can show that
+\begin{equation} \label{e:AF-def-alt}
+\chi(\tau,\nu) = e^{-2\pi j \nu \tau} \infint \tilde{u}(f)\;
+\tilde{u}^\ast(f-\nu) \;e^{2\pi j f \tau} \;df 
+\end{equation}
+If we look at the "wigner-form" we have
+\begin{equation} \label{e:AF-def-alt}
+\chi(\tau,\nu) = e^{-\pi j \nu \tau} \infint \tilde{u}(f + \nu/2)\;
+\tilde{u}^\ast(f-\nu/2) \;e^{2\pi j f \tau} \;df 
+\end{equation}
+
+
+\subsection{Computation of the Ambiguity Function}
+
+Depending upon whether one starts from \eqref{AF-def} or
+\eqref{AF-def-alt} a few different approaches for computing the
+Ambiguity Function are suggested.
+\begin{itemize}
+\item direct evaluation for a discrete set of $(\tau, \nu)$ pairs.
+  The most efficient approach for just a few points. In general it
+  takes a lot of computation to evaluate the AF, so this would be a
+  naive approach to evaluate the entire $\tau, \nu$ plane.
+\item Recognition of the the implied Fourier Transform in
+  \eqref{AF-def}.  Requires recorrelation for each range $\tau$, but
+  otherwise able to make use of the Fast Fourier Transform.  This is
+  the basic approach used to calculate the cross ambiguity function
+  for the Manastash Ridge Radar.  Sometimes referred to as a ``range
+  first'' calculation.  A fast approach for computing a range-cut.
+\item Recognition of the implied inverse Fourier Transform in
+  \eqref{AF-def-alt}.  A completely valid approach which performs a
+  correlation in the frquency domain.  A fast approach for computing a
+  Doppler cut.
+\end{itemize}
+
+
+\subsection{Interpretation of the Ambiguity Function}
+
+As defined, $|\chi(\tau,\nu)|$ is the magnitude of the response of the
+matched filter to delayed and Doppler-shifted versions of the original
+single.  It's a bit subtle, but $\chi$ has units of ``voltage''
+(explain more), and thus the square, $|\chi(\tau,\nu)|^2$ (no relation
+to ``chi-squared statistics,'' alas), has units of ``power'' or
+``energy'' and is thus an ``observable.''
+
+Since $|\chi|^2$ is strictly non-negative and integrable over the
+$\tau, \nu$ plane, it can apparently serve as some sort of probability
+density.  It represents a \textit{forward problem} \index{forward
+  problem} in the following sense. 
+
+\begin{quote}
+If a (normalized) target is present at the range/Doppler coordinates
+$\tau, \nu$, the output power from the undelayed, un-Doppler shifted
+matched filter would be $|\chi(\tau,\nu)|^2$.
+\end{quote}
+
+Thus, if we specify a particular situation, we can predict, or
+simulate what we would expect to happen.  However, with a radar, and
+with most instruments, we actually wish to solve a different problem,
+an \textit{inverse problem}:\index{inverse problem}  
+
+\begin{quote}
+Given a set of samples of the output of a matched filter, what
+possible target positions and motions could have been responsible for
+the measurements?
+\end{quote}
+
+In general, inverse problems are far more difficult to solve than
+forward problesm.  Indeed it can be tremendously difficult to even
+pose inverse problems in ways which permit their solution.  Also, the
+most general form of solution of an inverse problem is not a set of
+parameters, but rather a probability density for the desired
+parameters\cite{tarantola}. 
+
+Forward problem is a sequence of conditional probabilities:
+\begin{equation}
+p(voltage measured) = p(no-noise-output) * p(noise voltage)
+no-noise-output-power = chi(tau,nu)*target_power(sigma,tau,nu)
+\end{equation}
+
+TO BE CONTINUED
+
+\subsection{Ambiguity of some basic signals}
+
+\subsubsection{Square Pulse} The ambiguity function for the basic
+square pulse is readily evaluated, and given in the following formula:
+\begin{equation}
+|\chi(\tau,\nu)|^2 = \left\{\begin{array}{lcc}
+\frac{1 - \cos(2\pi\nu(1-|\tau|))}{2\pi^2 \nu^2} &\textrm{for} & |\tau| < 1\\
+0  & \textrm{for} & |\tau| > 0
+\end{array}\right.
+\end{equation}
+For the cut $\nu = 0$ the expected autocorrelation function (ACF)
+emerges, $|\chi(\tau,0)| = 1 - |\tau|$ for $|\tau| < 1$.  The
+ambiguity function is plotted in \figref{square-pulse-ambig}.
+
+\begin{figure}
+\centerline{\epsfxsize=0.4\textwidth  \epsffile{ambig-square-pulse-wire.eps} \epsfxsize=0.4\textwidth \epsffile{ambig-square-pulse-cntr.eps}}
+\caption{\label{f:square-pulse-ambig} The ambiguity function $|\chi|$
+  for a unit duration square pulse, plotted as a surface (left) and
+  with contours (right)}
+\end{figure}
+
+\subsubsection{Gaussian Pulse}
+
+Although not used for radar applications (because of the amplitude
+modulation), we can compute the ambiguity function of a gaussian
+pulse. CHECK THIS!!!!
+\begin{eqnarray}
+u(t) &=& \sqrt{\frac{1}{\sqrt{2\pi \sigma^2}} e^{-t^2/(2\sigma^2)}} \\
+|\chi(\tau,\nu)| &=& e^{-\tau^2/(8\sigma^2)} e^{-2 \pi^2 \sigma^2 \nu^2}
+\end{eqnarray}
+This is clearly the product of two gaussians, one in the delay
+direction ($\tau$) and one in the Doppler direction ($\nu$).  The
+product of the widths is $2\sigma/(2\pi\sigma) = 1/(2\pi)$, a constant.
+
+\subsubsection{Periodic Pulse Train}
+
+Consider a train of repeated pulses, each pulse with waveform $u_0(t)$
+having ambiguity function $\chi_0(\tau,\nu)$.  We can describe the
+sequence of $N$ pulses separated by interval $T$ as follows:
+\begin{equation}
+u(t) = \frac{1}{\sqrt{N}} \sum_{n=0}^{N-1} u_0(t - nT)
+\end{equation}
+

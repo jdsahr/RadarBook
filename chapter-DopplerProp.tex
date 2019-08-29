@@ -1,0 +1,257 @@
+\chapter{Propagation and Doppler Shift}
+
+\setlength{\arraycolsep}{0.5ex}
+
+Now we'll review propagation of radio waves.  The simplest model is an
+empty Galilean (non relativistic) universe containing a single target
+and a transmitter located at the origin.  Subsequently we'll permit
+the target to move, and even allow a varying media through which the
+wave travels to the ``target.''
+
+\section{Propagation in a simple universe}
+
+We've previously considered the amplitude of radar signals with the
+radar equation; now we'll consider other ways in which the signal is
+modified by delaying it and by Doppler shifting it.  We can simplify
+the discussion by considering a one dimensional universe.
+
+The transmitter emits some waveform $s(ct)$ which then propagates away
+from the transmitter, so that space-time contains the signal $s(ct -
+x)$ (consider $x > 0$ for now).  Notice that $ct$ has length units,
+which is conceptually useful and also connects radar to the theory of
+special relativity.
+
+The target located at $x_1$ is thus bathed in the signal $s(ct - x_1)$
+and it scatters a fraction of that signal, $f s((ct - x_1) + (x
+- x_1))$.  Here $f$ indicates the scattering amplitude, not the
+scattering cross section $\sigma$.  Letting $f$ be a simple scalar
+hides the realistic possibility that the scattering process may not be
+uniform for all frequencies --- thus the scattering amplitude should
+be more generally represented as an impulse response convolved with
+the illuminating signal; and even this does not admit the 
+possibility of a nonlinear scattering process.  Thus a little more
+generally, but not particularly usefully, we can write that
+backscattered signal $u(t,x) = \mathcal{S}[s(ct - x_1) + (x -
+x_1),x,t]$, where $\mathcal S$ is a nonlinear operator dependent upon
+space and time.
+
+When the scattered signal returns to the transmitter, it can be
+described as $f s((ct - x_1) + (0 - x1)) = f s(ct - 2x_1)$,
+the factor $2$ appearing to indicate the round trip.  If we compute
+the ``phase velocity'' $x/t = c/2$ we have a quantity that arises
+frequently in radar, the ``speed of radar.''  This speed is certainly
+$c/2 = 1.5\times 10^8$ m/s, but in units more convenient for radar
+technology it is also 150 km/ms and 150 m/$\mu$s.  Thus the echo of a
+target at a range of 150 km returns to the transmitter one millisecond
+after its transmission, and if the receiver is sampled at 1 $\mu$s
+intervals, each sample represents 150 m of range increment.
+
+\newenvironment{factoid}{}{}
+
+\begin{factoid} The ``Speed of Radar.''  The factor $c/2$ arises
+  frequently in radar, and has the value $1.5\times 10^8$ m/s.
+  However, it is very conveniently expressed additionally as
+\begin{displaymath}
+\frac{c}{2} = 150 \;\textrm{m}/\mu\textrm{s} = 150 \;\textrm{km/ms}
+\end{displaymath}
+\end{factoid}
+
+
+\section{Galilean Doppler Shift}
+
+Let us suppose that the target at $x_1$ is not fixed, but moving with
+some velocity, so that $x_1 \rightarrow x_1 + vt$.  If we illuminate the target
+with a sinusoid, $s(ct) = \cos(\omega t)$ then the returning
+scattered wave will be
+\begin{eqnarray*}
+\sigma \cos(\omega t - 2 k (x_1 + vt)) &\sim& 
+  \cos((\omega - 2kv) t - 2kx_1) \\
+&=&\cos((\omega + \Delta \omega)t - 2kx_1) \\
+\Delta \omega &=& -2kv \\[0.5ex]
+\Delta f      &=& -2\frac{v}{\lambda}
+\end{eqnarray*}
+Here $\Delta f$ is the Doppler Shift (in Hz) associated with motion of
+the target away from the transmitter, in particular, negative Doppler
+Shift is associated with increasing distance ($v > 0$) while positive
+Doppler Shift indicates decreasing distance.
+
+Both positive and negative frequencies are possible Doppler shifts;
+so we need to accomodate positive and negative frequencies in spectrum
+estimation of radar signals.  In conventional signal processing
+negative frequency content is implicitly paired with positive
+frequency content. In radar signal processing we will find that the
+``natural'' time series for radar signal processing is complex valued,
+not real valued, and that this provides a simple means to preserve the
+sign of the Doppler shift.
+
+\section{Relativistic Doppler Shift}
+
+In the previous derivation of the Doppler Shift, one might be troubled
+that a new frequency is generated without changing the wavenumber;
+thus the speed of propagation must change.  One could fix this problem
+by self consistently changing the wavenumber through a more
+sophisticated argument.  However a much more powerful approach is to
+rely directly upon Special Relativity.
+
+Consider three events: $\mathcal{A}$, a pulse of frequency $\omega$ is
+emitted from the transmitter; $\mathcal{O}$, the pulse encounters and
+scatters from a target; $\mathcal{B}$, the scattered signal returns to
+the transmitter.  For convenience, let us place the origin of all
+coordinate systems at $\mathcal{O}$, aligning the spatial axes of all
+coordinate systems; let the relative motion of the coordinate systems
+lie along the $x$ axis.  Thus, Lorentz Transformations of 4-vectors
+will affect only $x$ and $t$ axes.
+
+In its inertial frame, let the transmitter be located at $(x,y,z) =
+(x_t, y_t, 0)$.  The motion of the target is described in the
+transmitter frame as $x(t) = Vt, y = z = 0$.  The times of events
+$\mathcal{A}$ and $\mathcal{B}$ are easy to calculate,
+\begin{equation} \label{e:relativity1}
+ct_{\mathcal{A},\mathcal{B}} = \mp \sqrt{x_t^2 + y_t^2} = \mp r_t
+\end{equation}
+These can be easily converted to times in the target frame of
+reference through the Lorentz Tranformation:
+\begin{equation} \label{e:relativity2}
+ct_{\mathcal{A},\mathcal{B}}' = 
+  \gamma (ct_{\mathcal{A},\mathcal{B}} - \beta x_t) =
+  \gamma (\mp r_t - \beta x_t)
+\end{equation}
+Note that although the times of flight inbound and outbound are
+identical in the transmitter rest frame, but not (in general) in the
+target frame.
+
+In the rest frame of the target, the transmitter is moving, and its
+motion is described as $(x', y', z') = (x'_t - Vt', y'_t, 0)$.  The
+frequency of the incoming and outgoing waves is the same, say
+$\omega'$.  The total phase accumulated along the world lines
+$\mathcal{AO}$ and $\mathcal{OB}$ is
+\begin{eqnarray}
+\phi'_{\mathcal{AO}} &=& 
+ \frac{\omega'}{c}\left(0 - ct'_\mathcal{A}\right) = 
+ \frac{\omega'}{c}\left(\gamma(r_t - \beta x_t)\right) \\
+\phi'_{\mathcal{OB}} &=& 
+ \frac{\omega'}{c}\left(ct'_\mathcal{A} - 0\right) = 
+ \frac{\omega'}{c}\left(\gamma(r_t + \beta x_t)\right)
+\end{eqnarray}
+
+Since the phase is invariant to Lorentz Transformation, $\phi =
+\phi'$.  Thus, the frequencies in the frame of the transmitter are
+given by
+\begin{equation}
+\omega_{\mathcal{AO}, \mathcal{OB}} = 
+\frac{c\phi_{\mathcal{AO}, \mathcal{OB}}}
+            {ct_{\mathcal{A},\mathcal{B}}} =
+\frac{\gamma(r_t \mp \beta x_t)}{r_t}\omega'
+\end{equation}
+Thus, the change in frequency is easily expressed as a ratio,
+\begin{equation}
+\frac{f_r}{f_t} = \frac{\omega_{\mathcal{OB}}}{\omega_{\mathcal{AO}}}
+= \frac{r_t - \beta x_t}{r_t + \beta x_t}
+\end{equation}
+With $\cos(\theta) = x_t/r_t$ this may be written simply as
+\begin{eqnarray}
+\frac{f_r}{f_t} &=& \frac{1 - \beta \cos(\theta)}{1 + \beta \cos(\theta)}\\
+\frac{\Delta f}{f_t} = \frac{f_r - f_t}{f_t} &=& \frac{-2\beta\cos(\theta)}{1 + \beta\cos{\theta}}
+\end{eqnarray}
+The angle $\theta$ is determined by the radio wave propagation
+direction and the target velocity vector, such that $\theta = 0$
+corresponds to the target receding along the line of sight.
+
+Expanding the relativistic Doppler shift expression in $\beta$ we have
+\begin{equation}
+\frac{f_r}{f_t} = 
+1 - 2\beta\cos(\theta) + 2(\beta\cos(\theta))^2 + \cdots
+\end{equation}
+To first order in $\beta$ this agrees with the non relativistic
+development.
+
+Note that the target will (in general) see a Doppler shift of the
+transmitter signal even if there is no net Doppler shift at the
+receiver ($\cos(\theta) = 0$).  In fact, the target's frequency shift
+and radar frequency shift need not have the same sign.
+
+However, in the ordinary non relativistic case, the target Doppler
+shift will be half the radar Doppler shift, and relativistic
+corrections will be quite small.
+
+\begin{example} radar observation of meteor ``head echoes.''  Among the
+fastest targets commonly seen with radars are meteors.  Near Earth
+meteors may have velocity up to abuot 75 km/sec.  Relativistic
+corrections to Doppler phenomena would have size
+\begin{displaymath}
+\beta = \frac{v}{c} = \frac{75\times 10^3}{3\times 10^8} = 25\times
+10^{-5} = 0.00025
+\end{displaymath}
+Orbital velocity is 7.5 km/sec ($\beta = 2.5\times 10^{-5}$) and
+aircraft travelling at Mach 2 travel 750 m/s ($\beta = 2.5\times
+10^{-6}$).
+\end{example}
+
+\begin{factoid} The speed of light is just about one million times faster
+than the speed of sound in air; the speed of light is Mach One
+Million.
+\end{factoid}
+
+\section{Doppler Dispersion}
+
+The Doppler Shift expressions show that velocity applies a constant
+rescaling to the transmitter frequency.  If the transmitter waveform
+has nonzero bandwidth (described by a Fourier spectrum $P(f)\, df$),
+then the differential Doppler shift of higher frequencies is greater
+than that of lower frequencies.  Thus target motion causes the
+modification of the spectrum not as $P(f + \Delta f) \, df$ but rather
+as $P(\alpha f) \,df\!/\!\alpha$.  However, in the usual non
+relativistic case, with narrowband transmitter waveforms, $\alpha = 1
++ \epsilon$, $|\epsilon| \ll 1$, so that $P(\alpha f) \approx P(f +
+\epsilon f_t) = P(f + \Delta f)$, where $f_t$ is the center frequency
+of the transmitter.
+
+When the bandwidth of the scattered signal exceeds about one percent
+of the transmitter center frequency, this spectral asymmetry may need
+to be accounted for in precision measurements.  The circumstance
+arises in VHF and UHF radar observations of the ``plasma line'' in the
+ionosphere; the plasma line induces a shift (modulation) on the order
+of 10 MHz at the peak of the ionosphere (about 350 km at noon).
+
+\section{Variable Media}
+
+When the medium through which the wave propagates is not ideal vacuum,
+additional details must be accomodated.  If the medium is constant but
+dispersive, a short pulse injected into the medium will be spread in
+time.  If the medium has a time-varying index of refraction, scatter will
+be generated from that change.  Let us consider that case, briefly.
+
+Suppose that a transmitter is located at $x_1$ and a target at $x_2$
+separated by a region of space whose scalar dielectric constant is
+also a function of space, such that
+\begin{eqnarray*}
+\epsilon &=& \epsilon_0 + \epsilon_1(x,t) \\
+0 &\le& \epsilon_1(x,t)  \ll \epsilon_0
+\end{eqnarray*}
+Let us further suppose that the time scale for variation of the medium
+is slow compared to the transit time, namely
+\begin{displaymath}
+\epsilon_1(x,t) \left(\frac{\partial \epsilon_1(x,t)}{\partial t}\right)^{-1}
+\ll \frac{|x_t - x_r|}{c}
+\end{displaymath}
+Then the elapsed phase is $2\int k dx = 2\int \omega/v_{ph} dx$.
+\begin{displaymath}
+\phi(t) = 4\pi \int_{x_t(t)}^{x_r(t)} \frac{f}{v_{ph}(x,t)} \;\; dx
+\end{displaymath}
+The Doppler Shift is simply $\partial \phi/\partial t$, which in this
+fairly general case has three components due to the motion of the
+transmitter, the motion of the receiver, and the changing of the
+medium through which the radiowave travels.  Thus (frequently dropping
+the slow time dependence)
+\begin{displaymath}
+\Delta \omega =  4\pi f\left(
+\frac{\dot{x}_t}{v_{ph}(x_t)} - \frac{\dot{x}_r}{v_{ph}(x_r)} +
+\int_{x_t}^{x_r} \frac{\partial}{\partial t}
+\frac{dx}{v_{ph}(x,t)}
+\right)
+\end{displaymath}
+The first two terms represent the ordinary Doppler Shift associated
+with relative motion between the transmitter and scatterer.  The third
+term shows that a Doppler shift (change in frequency of scattered wave)
+can occur even if both the transmitter and target are fixed --- but
+the medium between them fluctuates.
